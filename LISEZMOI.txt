@@ -1,0 +1,14 @@
+EDSP-ESPACE TRANSPORT (TRANSPORT MANAGER) - Kit PWA, étape 1 : comptes et équipes
+
+Fichiers : index.html (application connectée), demo.html (démonstration des écrans futurs),
+config.js (adresse du projet et clé publique Supabase), sw.js, manifest.webmanifest, icônes.
+
+Mise en ligne : décompresser, puis déposer TOUT le dossier sur un hébergement HTTPS
+(Netlify Drop, Cloudflare Pages ou Vercel). Ouvrir l'adresse dans Chrome Android,
+puis menu > "Installer l'application".
+
+Mise à jour : redéposer le dossier complet. L'application récupère la nouvelle version
+au lancement suivant (avec du réseau).
+
+Important : config.js ne contient que la clé PUBLIQUE (anon). Ne jamais y mettre la clé
+"service_role" ou "secret".

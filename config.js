@@ -1,0 +1,1 @@
+window.TM_CONFIG={url:"https://dfsuaykafvtmmvdfluzt.supabase.co",key:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRmc3VheWthZnZ0bW12ZGZsdXp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0Mjc0MDEsImV4cCI6MjExMDAwMzQwMX0.xzbzVZxCC00lFAuSI11v5HDmaYDvTQu9C2Eg5eJITX4"};

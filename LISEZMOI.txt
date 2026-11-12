@@ -1,0 +1,9 @@
+EDSP-ESPACE TRANSPORT (TRANSPORT MANAGER) - Application complète, version 1
+
+POUR METTRE A JOUR L'APPLICATION (3 gestes)
+1. Décompresse ce ZIP.
+2. Sur GitHub, dans ton dépôt "espace-transport" : Add file > Upload files, glisse les 8 fichiers, puis Commit changes.
+3. Attends 2 minutes, ouvre l'application et fais Ctrl + F5.
+
+Fichiers : index.html (application), demo.html (démonstration), config.js, sw.js, manifest.webmanifest, 2 icônes, LISEZMOI.txt.
+config.js ne contient que la clé PUBLIQUE. Ne jamais y mettre la clé "service_role" ou "secret".

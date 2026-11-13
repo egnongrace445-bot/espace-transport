@@ -3,339 +3,342 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#22313a">
+<meta name="theme-color" content="#007A4D">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon-192.png">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>EDSP – ESPACE TRANSPORT</title>
 <style>
-:root{--bg:#eef0ec;--card:#fff;--ink:#1c2429;--mute:#5d6b73;--line:#d9ded9;--road:#22313a;--sun:#f2b705;--ok:#1d7a58;--bad:#b9382b;--warn:#b7791f;--okbg:#dff1e8;--badbg:#f8e0dc;--warnbg:#fbefd2;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root{--bg:#12191d;--card:#1b252b;--ink:#eaeeea;--mute:#98a7af;--line:#2d3b43;--road:#0d1316;--okbg:#17372b;--badbg:#412320;--warnbg:#3d3016;--ok:#55c595;--bad:#ef8b7f;--warn:#e8b64d}}
+:root{--bg:#f1f4f1;--card:#fff;--ink:#1b2a24;--mute:#5a6b63;--line:#d8e0da;--brand:#007A4D;--brand2:#00935C;--sun:#F77F00;--okbg:#dcf3e8;--badbg:#fbe1dc;--warnbg:#fdecd0;--ok:#0b7a4b;--bad:#b8352a;--warn:#a85f00;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1713;--card:#18231e;--ink:#e9f0ec;--mute:#9db0a6;--line:#2a3a32;--brand:#00573a;--brand2:#006f48;--okbg:#14382a;--badbg:#42221e;--warnbg:#41300f;--ok:#55c595;--bad:#ef8b7f;--warn:#f0b955}}
 *{box-sizing:border-box}html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
 h1,h2,h3{margin:0;letter-spacing:-.01em}
-.app{max-width:520px;margin:0 auto;padding-bottom:40px}
-header{background:var(--road);color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-header h1{font-size:16px;font-weight:800}header h1 span{color:var(--sun)}
-.sub{font-size:11px;letter-spacing:.14em;color:#b9c6cc;font-weight:600;margin-top:2px}
+.app{max-width:560px;margin:0 auto;padding-bottom:40px}
+header{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:4px solid var(--sun)}
+header svg{width:40px;height:40px;flex:none;border-radius:10px}
+header .t{flex:1;min-width:0}header h1{font-size:16px;font-weight:800;line-height:1.15}header h1 span{color:#ffc27a}
+.sub{font-size:11px;letter-spacing:.16em;color:#d4efe2;font-weight:600;margin-top:2px}
 main{padding:16px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
 .card h3{font-size:16px;margin-bottom:8px}
 .row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line)}
 .row:last-child{border:0}
+.col{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.neg{color:var(--bad)}
 .tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;font-weight:600;white-space:nowrap}
 .t-ok{background:var(--okbg);color:var(--ok)}.t-bad{background:var(--badbg);color:var(--bad)}.t-warn{background:var(--warnbg);color:var(--warn)}
-.btn{border:0;border-radius:10px;padding:11px 14px;font:inherit;font-weight:600;cursor:pointer;background:var(--road);color:#fff}
-.btn.sun{background:var(--sun);color:#1c2429}.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn{border:0;border-radius:10px;padding:11px 14px;font:inherit;font-weight:700;cursor:pointer;background:var(--brand);color:#fff}
+.btn.sun{background:var(--sun);color:#1b1200}.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
 .btn.sm{padding:6px 10px;font-size:13px}.btn:disabled{opacity:.5;cursor:wait}
 .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.btns .btn{flex:1;min-width:110px}
 label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px}
 input,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+input[type=checkbox]{width:auto;margin-right:8px}
 .note{font-size:12.5px;color:var(--mute);margin-top:8px}
-.code{font-family:ui-monospace,Menlo,monospace;font-size:20px;font-weight:700;letter-spacing:.06em;background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;display:inline-block;margin:6px 0}
-.meter{height:6px;border-radius:3px;background:var(--line);margin-bottom:8px}.meter i{display:block;height:6px;border-radius:3px;background:var(--sun)}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:20px;font-weight:700;letter-spacing:.06em;background:var(--bg);border:1px dashed var(--sun);border-radius:10px;padding:8px 12px;display:inline-block;margin:6px 0}
 .chip{font-family:ui-monospace,Menlo,monospace;font-weight:700;border:2px solid var(--ink);border-radius:6px;padding:1px 7px;font-size:13px;white-space:nowrap}
-.seg{display:flex;gap:6px}.seg button{flex:1}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--road);color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;z-index:9;max-width:90%}
+.seg{display:flex;gap:6px}.seg>*{flex:1}
+.nav{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;padding-bottom:2px}.nav .btn{white-space:nowrap;flex:none;padding:9px 12px;font-size:14px}
+.big{font-size:30px;font-weight:800;line-height:1.1}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--brand);color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;z-index:30;max-width:90%;box-shadow:0 4px 14px #0004}
+#splash{position:fixed;inset:0;z-index:50;background:linear-gradient(160deg,var(--brand),var(--brand2));color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;transition:opacity .5s}
+#splash.off{opacity:0;pointer-events:none}
+#splash svg{width:132px;height:132px;border-radius:30px;box-shadow:0 8px 30px #0005;animation:pop .8s ease-out}
+#splash h1{font-size:22px;margin-top:18px;font-weight:800}#splash h1 span{color:#ffc27a}
+#splash p{letter-spacing:.28em;font-size:12px;margin:6px 0 0;color:#d4efe2;font-weight:600}
+@keyframes pop{from{transform:scale(.6) rotate(-25deg);opacity:0}to{transform:none;opacity:1}}
 a{color:inherit}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
 </style>
 </head>
 <body>
+<div id="splash"></div>
 <div class="app">
-<header>
-  <div><h1>EDSP – <span>ESPACE TRANSPORT</span></h1><div class="sub">TRANSPORT MANAGER</div></div>
-  <button class="btn ghost sm" id="out" hidden style="color:#fff;border-color:#ffffff55">Déconnexion</button>
-</header>
-<main id="main"><p class="note">Chargement…</p></main>
+<header><span id="hl"></span><div class="t"><h1>EDSP – <span>ESPACE TRANSPORT</span></h1><div class="sub">TRANSPORT MANAGER</div></div><button class="btn ghost sm" id="out" hidden style="color:#fff;border-color:#ffffff88">Déconnexion</button></header>
+<main id="main"></main>
 </div>
 <div class="toast" id="toast" hidden></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
 <script>
+const LOGO='<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="512" height="512" rx="112" fill="#007A4D"/><circle cx="256" cy="256" r="150" fill="none" stroke="#F77F00" stroke-width="46"/><path d="M256 256 L120 232 M256 256 L392 232 M256 256 V396" stroke="#fff" stroke-width="34" stroke-linecap="round" fill="none"/><circle cx="256" cy="256" r="40" fill="#fff"/></svg>';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const RN={owner:"Propriétaire",manager:"Gestionnaire ou comptable",driver:"Chauffeur"};
-const ST={pending:["t-warn","En attente"],active:["t-ok","Actif"],suspended:["t-bad","Refusé"]};
-let sb=null,user=null,profile=null,mem=[],reqs={},mode="in",busy=false,D={},tab=null;
+const fmt=n=>Math.round(+n||0).toLocaleString("fr-FR")+" FCFA";
+const today=()=>new Date().toLocaleDateString("sv-SE");
+const dl=d=>Math.round((new Date(d+"T00:00:00")-new Date(today()+"T00:00:00"))/864e5);
+const RN={owner:"Propriétaire",fleet_manager:"Gestionnaire de flotte",accountant:"Comptable",technician:"Technicien",driver:"Chauffeur"};
+const TN={vtc:"VTC",taxi:"Taxi",gbaka:"Gbaka",woro:"Wôrô-wôrô"};
+const CAT={essence:"Essence",gasoil:"Gasoil",lavage:"Lavage",parking:"Parking",peage:"Péage",credit_telephonique:"Crédit téléphonique",pneu:"Pneu",reparation:"Réparation",gare_syndicat:"Gare ou syndicat",autre:"Autre dépense"};
+const DOCT={assurance:"Assurance",visite_technique:"Visite technique",carte_grise:"Carte grise",autorisation_transport:"Autorisation de transport",autre:"Autre document"};
+const CS={draft:["t-warn","Brouillon"],submitted:["t-warn","À valider"],validated:["t-ok","Validée"],returned:["t-bad","Renvoyée"]};
+const MS={reported:["t-bad","Signalé"],planned:["t-warn","Planifié"],in_progress:["t-warn","En cours"],done:["t-ok","Terminé"],cancelled:["t-bad","Annulé"]};
+const NEXT={reported:"planned",planned:"in_progress",in_progress:"done"},NEXTL={reported:"Planifier",planned:"Démarrer",in_progress:"Terminé"};
+const tag=a=>`<span class="tag ${a[0]}">${a[1]}</span>`;
+const sel=(id,o,v)=>`<select id="${id}">${o.map(x=>`<option value="${x[0]}"${x[0]===v?" selected":""}>${x[1]}</option>`).join("")}</select>`;
+const card=(t,b)=>`<div class="card">${t?`<h3>${t}</h3>`:""}${b}</div>`;
+const none=t=>`<p class="note" style="margin:0">${t}</p>`;
+const uid=()=>crypto.randomUUID();
 
+let sb=null,user=null,mems=[],bid=null,roles=[],P=new Set(),D={},tab=null,mode="in",busy=false;
+const can=p=>P.has(p),isDrv=()=>roles.includes("driver");
+const QK="tm-queue2",qget=()=>{try{return JSON.parse(localStorage.getItem(QK)||"[]")}catch(e){return[]}},qset=q=>{try{localStorage.setItem(QK,JSON.stringify(q))}catch(e){}};
 function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,3500)}
 function msg(e){const m=(e&&e.message)||String(e);
  if(/Invalid login/i.test(m))return"E-mail ou mot de passe incorrect.";
- if(/already registered/i.test(m))return"Cette adresse e-mail a déjà un compte. Utilise « Se connecter ».";
+ if(/already registered/i.test(m))return"Cette adresse e-mail a déjà un compte.";
  if(/Password should be/i.test(m))return"Mot de passe trop court (6 caractères minimum).";
  if(/rate limit/i.test(m))return"Trop d’essais. Réessaie dans quelques minutes.";
+ if(/duplicate key/i.test(m))return"Cet élément existe déjà.";
  if(/fetch|network/i.test(m))return"Pas de connexion internet.";
+ if(/row-level security/i.test(m))return"Action non autorisée pour ton rôle.";
  return m}
+async function flush(){const q=qget();if(!q.length||!navigator.onLine||!sb)return;let left=[];
+ for(const t of ["revenues","expenses"]){const rows=q.filter(x=>x.t===t).map(x=>x.row);if(!rows.length)continue;
+  const r=await sb.from(t).upsert(rows,{onConflict:"id",ignoreDuplicates:true});if(r.error)left=left.concat(q.filter(x=>x.t===t))}
+ qset(left);if(left.length<q.length)toast((q.length-left.length)+" saisie(s) envoyée(s).")}
 
 async function init(){
- if(!window.supabase||!window.TM_CONFIG){$("main").innerHTML='<div class="card"><h3>Connexion impossible</h3><p class="note">Internet est nécessaire au premier lancement pour charger l’application.</p></div>';return}
+ $("splash").innerHTML=LOGO+'<div><h1 style="margin-top:18px">EDSP – <span>ESPACE TRANSPORT</span></h1><p>TRANSPORT MANAGER</p></div>';
+ $("hl").innerHTML=LOGO;
+ const t0=Date.now(),hide=()=>setTimeout(()=>$("splash").classList.add("off"),Math.max(0,1300-(Date.now()-t0)));
+ if(!window.supabase||!window.TM_CONFIG){$("main").innerHTML=card("Connexion impossible",none("Internet est nécessaire au premier lancement."));hide();return}
  sb=supabase.createClient(TM_CONFIG.url,TM_CONFIG.key);
- sb.auth.onAuthStateChange(ev=>{if(ev==="SIGNED_OUT"){user=null;mem=[];reqs={};setTimeout(view,0)}});
+ sb.auth.onAuthStateChange(ev=>{if(ev==="SIGNED_OUT"){user=null;mems=[];bid=null;D={};setTimeout(view,0)}});
  const r=await sb.auth.getSession();user=r.data.session?r.data.session.user:null;
- await flush();await load();
+ await flush();await load();hide();
 }
 
 async function load(){
  if(!user){view();return}
  try{
-  const p=await sb.from("profiles").select("full_name").eq("id",user.id).maybeSingle();profile=p.data;
-  const m=await sb.from("memberships").select("id,role,status,owner_id,owners(name,code)").eq("user_id",user.id).order("created_at");
-  if(m.error)throw m.error;mem=m.data||[];reqs={};
-  for(const x of mem.filter(a=>a.role==="owner"&&a.status==="active")){
-   const r=await sb.from("memberships").select("id,role,status,user_id,profiles(full_name)").eq("owner_id",x.owner_id).neq("user_id",user.id).order("created_at");
-   reqs[x.owner_id]=r.data||[];
-  }
-  await loadSpace();
-  try{localStorage.setItem("tm-snap",JSON.stringify({u:user.id,mem,reqs,D}))}catch(e){}
- }catch(e){try{const s=JSON.parse(localStorage.getItem("tm-snap")||"null");if(s&&s.u===user.id){mem=s.mem;reqs=s.reqs;D=s.D}}catch(x){}toast(msg(e))}
+  const m=await sb.from("business_memberships").select("id,business_id,role,status,business_accounts(name,code)").eq("user_id",user.id).order("created_at");
+  if(m.error)throw m.error;mems=m.data||[];
+  const act=mems.filter(x=>x.status==="active"),sv=localStorage.getItem("tm-biz");
+  bid=((act.find(x=>x.business_id===sv)||act[0])||{}).business_id||null;
+  roles=act.filter(x=>x.business_id===bid).map(x=>x.role);P=new Set();D={};
+  if(bid){const p=await sb.from("role_permissions").select("permission").in("role",roles);(p.data||[]).forEach(x=>P.add(x.permission));
+   if(P.size)await loadStaff();if(isDrv())await loadDrv()}
+  try{localStorage.setItem("tm-snap2",JSON.stringify({u:user.id,mems,bid,roles,P:[...P],D}))}catch(e){}
+ }catch(e){try{const s=JSON.parse(localStorage.getItem("tm-snap2")||"null");if(s&&s.u===user.id){mems=s.mems;bid=s.bid;roles=s.roles;P=new Set(s.P);D=s.D}}catch(x){}toast(msg(e))}
  view();
 }
 
-function accView(){
- const name=(profile&&profile.full_name)||user.email;
- const hasOwner=mem.some(a=>a.role==="owner");
- const free=(D.veh||[]).filter(v=>!(D.asg||[]).some(x=>x.vehicle_id===v.id));
- let h=`<div class="card"><h3>Bonjour ${esc(name)}</h3><div class="note" style="margin:0">${esc(user.email)}</div></div>`;
- if(!mem.length)h+=`<div class="card"><h3>Bienvenue</h3><p class="note" style="margin-top:0">Choisis ton profil pour commencer.</p></div>`;
- mem.forEach(a=>{
-  const o=a.owners||{},s=ST[a.status]||["t-warn",a.status];
-  h+=`<div class="card"><div class="row" style="padding-top:0"><span><b>${RN[a.role]}</b><br><span class="note" style="margin:0">${esc(o.name)}</span></span><span class="tag ${s[0]}">${s[1]}</span></div>`;
-  if(a.role==="owner"&&a.status==="active"){
-   h+=`<div class="note" style="margin-top:4px">Code à donner à tes chauffeurs et gestionnaires :</div><div class="code">${esc(o.code)}</div>`;
-   const rs=reqs[a.owner_id]||[];
-   h+=`<h3 style="margin-top:10px">Demandes et équipe</h3>`;
-   if(!rs.length)h+=`<p class="note" style="margin-top:0">Aucune demande pour l’instant.</p>`;
-   rs.forEach(r=>{const t=ST[r.status];
-    h+=`<div class="row"><span><b>${esc(r.profiles&&r.profiles.full_name||"Sans nom")}</b><br><span class="note" style="margin:0">${RN[r.role]}</span></span>`+
-     (r.status==="pending"?`<span style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">${r.role==="driver"&&free.length?`<select id="fv${r.id}" style="width:auto">${free.map(v=>`<option value="${v.id}">${esc(v.plate)}</option>`).join("")}</select><button class="btn sun sm" data-a="accasg" data-id="${r.id}" data-u="${r.user_id}">Accepter et affecter</button>`:`<button class="btn sun sm" data-a="dec" data-id="${r.id}" data-v="active">Accepter</button>`}<button class="btn ghost sm" data-a="dec" data-id="${r.id}" data-v="suspended">Refuser</button></span>`:`<span class="tag ${t[0]}">${t[1]}</span>`)+`</div>`;
-   });
-  }
-  if(a.role!=="owner"&&a.status==="pending")h+=`<p class="note">Ta demande est envoyée. Le propriétaire doit la confirmer avant que tu accèdes à son espace. Cette page se met à jour toute seule dès qu’il accepte.</p>`;
-  if(a.status==="active"&&a.role!=="owner")h+=`<p class="note">Accès confirmé. Les véhicules, saisies et clôtures arrivent à l’étape suivante.</p>`;
-  h+=`</div>`;
- });
- if(!hasOwner)h+=`<div class="card"><h3>Je suis propriétaire</h3><label for="on">Nom de ton entreprise ou activité</label><input id="on" placeholder="Ex. Transports Kouassi"><div class="btns"><button class="btn sun" data-a="own">Créer mon espace</button></div></div>`;
- h+=`<div class="card"><h3>Je rejoins un propriétaire</h3><label for="jc">Code du propriétaire</label><input id="jc" placeholder="PROP-XXXXXX" autocapitalize="characters"><label for="jr">Mon rôle</label><select id="jr"><option value="driver">Chauffeur</option><option value="manager">Gestionnaire ou comptable</option></select><div class="btns"><button class="btn sun" data-a="join">Envoyer ma demande</button></div></div>`;
- h+=`<p class="note"><a href="demo.html">Voir la démonstration</a> des écrans à venir (maintenance, rapports).</p>`;
- return h;
+async function loadStaff(){
+ const q=(t,c)=>sb.from(t).select(c).eq("business_id",bid),vr=can("vehicle.read");
+ const r=await Promise.all([
+  can("member.read")?q("business_memberships","id,user_id,role,status,profiles(full_name)"):null,
+  vr?q("vehicles","id,plate,make,model,transport_type,status,line_id"):null,
+  vr?q("transport_lines","id,name,transport_type"):null,
+  vr?q("vehicle_assignments","id,vehicle_id,driver_id").is("ends_on",null):null,
+  can("contract.read")?q("contracts","id,vehicle_id,mode,period,fixed_amount,percentage,rest_days_per_week,carry_over_arrears").is("ends_on",null):null,
+  can("document.read")?q("documents","id,target_id,doc_type,expires_on").eq("target_type","vehicle"):null,
+  (can("finance.read")||can("settlement.review"))?q("settlements","shift_id,status,net,due_owner,driver_balance,return_reason,submitted_at").order("submitted_at",{ascending:false}).limit(30):null,
+  can("ledger.read")?q("ledger_entries","driver_id,amount"):null,
+  can("payment.record")?q("payments","id,driver_id,kind,method,amount").is("acknowledged_at",null):null,
+  can("maintenance.read")?q("maintenance_orders","id,vehicle_id,kind,status,release_decision").order("created_at",{ascending:false}).limit(20):null]);
+ const v=i=>(r[i]&&r[i].data)||[];
+ D.mem=v(0);D.veh=v(1);D.lines=v(2);D.asg=v(3);D.con=v(4);D.docs=v(5);D.set=v(6);D.led=v(7);D.pay=v(8);D.mnt=v(9);D.sh={};
+ if(D.set.length){const s=await sb.from("shifts").select("id,shift_date,vehicle_id,driver_id").in("id",D.set.map(x=>x.shift_id));(s.data||[]).forEach(x=>D.sh[x.id]=x)}
 }
-
-
-/* ===== Étape 2 : véhicules, affectations, saisies, clôtures ===== */
-const CS={brouillon:["t-warn","Brouillon"],soumise:["t-warn","À valider"],validee:["t-ok","Validée"],renvoyee:["t-bad","Renvoyée"]};
-const TN={vtc:"VTC",taxi:"Taxi",gbaka:"Gbaka",woro:"Wôrô-wôrô"};
-const fmt=n=>Math.round(n).toLocaleString("fr-FR")+" FCFA";
-const today=()=>new Date().toLocaleDateString("sv-SE");
-const act=()=>mem.find(a=>a.status==="active");
-const DT={assurance:"Assurance",visite_technique:"Visite technique",carte_grise:"Carte grise",autre:"Autre document"};
-const dl=d=>Math.round((new Date(d+"T00:00:00")-new Date(today()+"T00:00:00"))/864e5);
-const docRows=l=>l.map(d=>{const j=dl(d.due_date),t=j<0?["t-bad","Expiré"]:j<=5?["t-warn","Dans "+j+" j"]:["t-ok","Valide"];return `<div class="row"><span>${DT[d.doc_type]}<br><span class="note" style="margin:0">échéance ${d.due_date.split("-").reverse().join("/")}</span></span><span class="tag ${t[0]}">${t[1]}</span></div>`}).join("");
-const QK="tm-queue",qget=()=>{try{return JSON.parse(localStorage.getItem(QK)||"[]")}catch(e){return[]}},qset=q=>{try{localStorage.setItem(QK,JSON.stringify(q))}catch(e){}};
-async function flush(){const q=qget();if(!q.length||!navigator.onLine||!sb)return;const r=await sb.from("entries").upsert(q,{onConflict:"id",ignoreDuplicates:true});if(!r.error){qset([]);toast(q.length+" saisie(s) envoyée(s).")}}
-function calc(es,ru){let r=0,c=0,o=0;es.forEach(e=>{if(e.entry_type==="recette")r+=e.amount;else if(e.entry_type==="carburant")c+=e.amount;else o+=e.amount});
- const net=r-c-o,due=!ru?0:ru.mode==="fixe"?Math.min(ru.value,Math.max(net,0)):Math.max(net,0)*ru.value/100;return{r,c,o,net,due,bal:net-due}}
-const sumRows=s=>`<div class="row"><span>Recettes</span><b>${fmt(s.r)}</b></div><div class="row"><span>Carburant</span><b>− ${fmt(s.c)}</b></div><div class="row"><span>Autres dépenses</span><b>− ${fmt(s.o)}</b></div><div class="row"><span>Résultat</span><b>${fmt(s.net)}</b></div><div class="row"><span>Dû au propriétaire</span><b>${fmt(s.due)}</b></div><div class="row"><span>Reste au chauffeur</span><b>${fmt(s.bal)}</b></div>`;
-
-async function loadSpace(){
- D={};const a=act();if(!a)return;const oid=a.owner_id;
- if(a.role==="driver"){
-  const r=await sb.from("assignments").select("vehicle_id").eq("driver_id",user.id).is("ends_on",null);
-  const vid=r.data&&r.data[0]&&r.data[0].vehicle_id;if(!vid)return;
-  const q=await Promise.all([
-   sb.from("vehicles").select("id,plate,model,transport_type,lines(name)").eq("id",vid).maybeSingle(),
-   sb.from("contracts").select("mode,value").eq("vehicle_id",vid).is("ends_on",null).limit(1),
-   sb.from("work_days").select("id").eq("vehicle_id",vid).eq("driver_id",user.id).eq("work_date",today()).maybeSingle()]);
-  D.my=q[0].data;D.rule=(q[1].data||[])[0]||null;D.day=q[2].data;D.ents=[];
-  const dd=await sb.from("vehicle_documents").select("doc_type,due_date").eq("vehicle_id",vid);D.docs=dd.data||[];
-  if(D.day){const e=await sb.from("entries").select("id,entry_type,category,label,amount").eq("work_day_id",D.day.id).order("client_ts");D.ents=e.data||[];
-   const k=await sb.from("closures").select("status,return_reason").eq("work_day_id",D.day.id).maybeSingle();D.clo=k.data}
-  return;
- }
+async function loadDrv(){
+ const a=await sb.from("vehicle_assignments").select("vehicle_id").eq("driver_id",user.id).eq("business_id",bid).is("ends_on",null);
+ const vid=a.data&&a.data[0]&&a.data[0].vehicle_id;
+ const L=await Promise.all([sb.from("ledger_entries").select("amount").eq("driver_id",user.id).eq("business_id",bid),
+  sb.from("payments").select("id,kind,amount,acknowledged_at").eq("driver_id",user.id).eq("business_id",bid).order("paid_at",{ascending:false}).limit(10)]);
+ D.dBal=(L[0].data||[]).reduce((s,x)=>s+(+x.amount),0);D.dPay=L[1].data||[];D.my=null;
+ if(!vid)return;
  const q=await Promise.all([
-  sb.from("vehicles").select("id,plate,model,transport_type,lines(name)").eq("owner_id",oid).order("created_at"),
-  sb.from("assignments").select("id,vehicle_id,driver_id,profiles(full_name)").eq("owner_id",oid).is("ends_on",null),
-  sb.from("contracts").select("id,vehicle_id,mode,value").eq("owner_id",oid).is("ends_on",null),
-  sb.from("memberships").select("user_id,status,profiles(full_name)").eq("owner_id",oid).eq("role","driver"),
-  sb.from("closures").select("work_day_id,status,return_reason").eq("owner_id",oid),
-  sb.from("work_days").select("id,work_date,vehicle_id,driver_id").eq("owner_id",oid).order("work_date",{ascending:false}).limit(30),
-  sb.from("vehicle_documents").select("id,vehicle_id,doc_type,due_date").eq("owner_id",oid),
-  sb.from("maintenance").select("id,vehicle_id,kind,status").eq("owner_id",oid).order("created_at",{ascending:false}).limit(20)]);
- D.veh=q[0].data||[];D.asg=q[1].data||[];D.con=q[2].data||[];
- const nm={};(q[3].data||[]).forEach(x=>nm[x.user_id]=x.profiles&&x.profiles.full_name);
- D.drv=(q[3].data||[]).filter(x=>x.status==="active");
- const cm={};(q[4].data||[]).forEach(x=>cm[x.work_day_id]=x);
- const pl={};D.veh.forEach(v=>pl[v.id]=v.plate);
- const L=[];(q[5].data||[]).forEach(w=>{const c=cm[w.id];if(c)L.push({id:w.id,date:w.work_date,plate:pl[w.vehicle_id],driver:nm[w.driver_id]||"Chauffeur",st:c.status,why:c.return_reason})});
- await Promise.all(L.map(async x=>{const r=await sb.rpc("day_summary",{p_day:x.id});const s=(r.data||[])[0]||{};
-  x.s={r:+s.recettes||0,c:+s.carburant||0,o:+s.depenses||0,net:+s.net||0,due:+s.due||0,bal:+s.driver_balance||0}}));
- D.cl=L;D.docs=q[6].data||[];D.mt=q[7].data||[];
- const since=new Date(Date.now()-6*864e5).toLocaleDateString("sv-SE"),wk=(q[5].data||[]).filter(w=>w.work_date>=since);
- let es=[];if(wk.length){const e=await sb.from("entries").select("work_day_id,entry_type,category,amount").in("work_day_id",wk.map(w=>w.id));es=e.data||[]}
- const bw={},cat={};es.forEach(e=>{const t=bw[e.work_day_id]=bw[e.work_day_id]||{r:0,x:0};if(e.entry_type==="recette")t.r+=e.amount;else{t.x+=e.amount;cat[e.category]=(cat[e.category]||0)+e.amount}});
- const days={};let rec=0,dep=0,due=0;
- wk.forEach(w=>{const t=bw[w.id]||{r:0,x:0},net=t.r-t.x,ct=D.con.find(c=>c.vehicle_id===w.vehicle_id);
-  due+=!ct?0:ct.mode==="fixe"?Math.min(ct.value,Math.max(net,0)):Math.max(net,0)*ct.value/100;rec+=t.r;dep+=t.x;days[w.work_date]=(days[w.work_date]||0)+t.r});
- D.rep={rec,dep,due,days,cat};
+  sb.from("vehicles").select("id,plate,make,model,transport_type,line_id").eq("id",vid).maybeSingle(),
+  sb.from("contracts").select("mode,period,fixed_amount,percentage,rest_days_per_week,carry_over_arrears").eq("vehicle_id",vid).is("ends_on",null).limit(1),
+  sb.from("documents").select("doc_type,expires_on").eq("target_type","vehicle").eq("target_id",vid),
+  sb.from("shifts").select("id").eq("vehicle_id",vid).eq("driver_id",user.id).eq("shift_date",today()).maybeSingle()]);
+ D.my=q[0].data;D.rule=(q[1].data||[])[0]||null;D.ddocs=q[2].data||[];D.shift=q[3].data;D.line=null;D.rev=[];D.exp=[];D.st=null;
+ if(D.my&&D.my.line_id){const l=await sb.from("transport_lines").select("name").eq("id",D.my.line_id).maybeSingle();D.line=l.data}
+ if(D.shift){const w=await Promise.all([sb.from("revenues").select("id,amount,source").eq("shift_id",D.shift.id).order("received_at"),
+  sb.from("expenses").select("id,category,amount,status,note").eq("shift_id",D.shift.id).order("spent_at"),
+  sb.from("settlements").select("status,return_reason").eq("shift_id",D.shift.id).maybeSingle()]);
+  D.rev=w[0].data||[];D.exp=w[1].data||[];D.st=w[2].data}
 }
 
-function vehView(){
- const a=act(),own=a.role==="owner",V=D.veh||[];let h="";
- if(own)h+=`<div class="card"><h3>Ajouter un véhicule</h3><label for="vp">Plaque</label><input id="vp" placeholder="5821 GH 01"><label for="vm">Modèle</label><input id="vm" placeholder="Toyota Corolla"><label for="vt">Type de transport</label><select id="vt">${Object.keys(TN).map(k=>`<option value="${k}">${TN[k]}</option>`).join("")}</select><label for="vl">Ligne (Gbaka et Wôrô-wôrô seulement)</label><input id="vl" placeholder="Ex. Yopougon – Adjamé"><div class="btns"><button class="btn sun" data-a="addveh">Ajouter</button></div></div>`;
- if(!V.length)h+=`<div class="card"><p class="note" style="margin:0">Aucun véhicule pour l’instant.</p></div>`;
- V.forEach((v,i)=>{const as=(D.asg||[]).find(x=>x.vehicle_id===v.id),co=(D.con||[]).find(x=>x.vehicle_id===v.id);
-  h+=`<div class="card"><div class="row" style="padding-top:0"><span class="chip">${esc(v.plate)}</span><span class="note" style="margin:0">${esc(v.model||"")} · ${TN[v.transport_type]}${v.lines?" · "+esc(v.lines.name):""}</span></div>`;
-  h+=`<div class="row"><span>Chauffeur</span><span>`+(as?`<b>${esc(as.profiles&&as.profiles.full_name||"—")}</b>`+(own?` <button class="btn ghost sm" data-a="unasg" data-id="${as.id}">Retirer</button>`:""):(own&&(D.drv||[]).length?`<select id="as${i}" style="width:auto"><option value="">Choisir…</option>${D.drv.map(d=>`<option value="${d.user_id}">${esc(d.profiles&&d.profiles.full_name||"Chauffeur")}</option>`).join("")}</select> <button class="btn sun sm" data-a="asg" data-v="${v.id}" data-i="${i}">Affecter</button>`:`<span class="note" style="margin:0">Non affecté</span>`))+`</span></div>`;
-  h+=own?`<label for="cm${i}">Contrat</label><div class="seg"><select id="cm${i}"><option value="fixe" ${co&&co.mode==="fixe"?"selected":""}>Versement fixe (FCFA / jour)</option><option value="pourcentage" ${co&&co.mode==="pourcentage"?"selected":""}>Pourcentage (%)</option></select><input id="cv${i}" type="number" min="0" value="${co?co.value:""}" placeholder="Valeur"></div><div class="btns"><button class="btn ghost sm" data-a="con" data-v="${v.id}" data-i="${i}">Enregistrer le contrat</button></div>`:`<div class="row"><span>Contrat</span><b>${co?(co.mode==="fixe"?fmt(co.value)+" / jour":co.value+" %"):"—"}</b></div>`;
-  h+=docRows((D.docs||[]).filter(d=>d.vehicle_id===v.id))+(own?`<div class="seg" style="margin-top:8px"><select id="dt${i}">${Object.keys(DT).map(k=>`<option value="${k}">${DT[k]}</option>`).join("")}</select><input id="dd${i}" type="date"></div><div class="btns"><button class="btn ghost sm" data-a="adddoc" data-v="${v.id}" data-i="${i}">Ajouter le document</button></div>`:"");
-  h+=`</div>`});
- return h+mtView();
-}
-function mtView(){const own=act().role==="owner",V={},MS={signale:["t-bad","Signalé"],planifie:["t-warn","Planifié"],termine:["t-ok","Terminé"]};(D.veh||[]).forEach(v=>V[v.id]=v.plate);
- return `<div class="card"><h3>Maintenance</h3>${(D.mt||[]).length?D.mt.map(x=>{const t=MS[x.status];return `<div class="row"><span><b>${esc(x.kind)}</b><br><span class="note" style="margin:0">${esc(V[x.vehicle_id]||"")}</span></span><span style="text-align:right"><span class="tag ${t[0]}">${t[1]}</span>${own&&x.status!=="termine"?`<br><button class="btn ghost sm" style="margin-top:6px" data-a="mt" data-id="${x.id}" data-v="${x.status==="signale"?"planifie":"termine"}">${x.status==="signale"?"Planifier":"Terminé"}</button>`:""}</span></div>`}).join(""):'<p class="note" style="margin:0">Aucun problème signalé.</p>'}</div>`}
-function repView(){const R=D.rep||{rec:0,dep:0,due:0,days:{},cat:{}},dk=Object.keys(R.days).sort(),mx=Math.max(1,...Object.values(R.days)),cs=Object.entries(R.cat).sort((a,b)=>b[1]-a[1]),cm=cs.length?cs[0][1]:1;
- const bar=(l,v,m)=>`<div class="row" style="border:0;padding-bottom:2px"><span>${l}</span><b>${fmt(v)}</b></div><div class="meter"><i style="width:${Math.round(v/m*100)}%"></i></div>`;
- return `<div class="card"><h3>7 derniers jours</h3><div class="row"><span>Recettes</span><b>${fmt(R.rec)}</b></div><div class="row"><span>Dépenses</span><b>− ${fmt(R.dep)}</b></div><div class="row"><span>Dû au propriétaire</span><b>${fmt(R.due)}</b></div><div class="row"><span>Reste aux chauffeurs</span><b>${fmt(R.rec-R.dep-R.due)}</b></div><p class="note">Toutes les journées saisies, validées ou non.</p></div><div class="card"><h3>Recettes par jour</h3>${dk.length?dk.map(k=>bar(k.slice(8)+"/"+k.slice(5,7),R.days[k],mx)).join(""):'<p class="note" style="margin:0">Aucune donnée.</p>'}</div><div class="card"><h3>Dépenses par catégorie</h3>${cs.length?cs.map(x=>bar(esc(x[0]),x[1],cm)).join(""):'<p class="note" style="margin:0">Aucune donnée.</p>'}</div>`}
+/* ---------- calculs ---------- */
+function dueOf(net,r){if(!r)return 0;
+ const fx=r.mode==="percentage"?0:(r.period==="week"?r.fixed_amount/Math.max(7-(r.rest_days_per_week||0),1):r.fixed_amount);
+ const raw=r.mode==="fixed"?fx:r.mode==="percentage"?Math.max(net,0)*r.percentage/100:fx+Math.max(net-fx,0)*r.percentage/100;
+ return r.carry_over_arrears?raw:Math.min(raw,Math.max(net,0))}
+const docRows=l=>l.map(d=>{const j=d.expires_on?dl(d.expires_on):null,t=j===null?["t-warn","Sans date"]:j<0?["t-bad","Expiré"]:j<=5?["t-warn","Dans "+j+" j"]:["t-ok","Valide"];
+ return `<div class="row"><span>${DOCT[d.doc_type]||esc(d.doc_type)}<br><span class="note" style="margin:0">${d.expires_on?"échéance "+d.expires_on.split("-").reverse().join("/"):""}</span></span>${tag(t)}</div>`}).join("");
+const nameOf=u=>{const m=(D.mem||[]).find(x=>x.user_id===u);return(m&&m.profiles&&m.profiles.full_name)||"Membre"};
+const plateOf=id=>{const v=(D.veh||[]).find(x=>x.id===id);return v?v.plate:""};
 
-function cloView(){
- const L=D.cl||[];
- return `<div class="card"><h3>Clôtures des journées</h3>${L.length?"":'<p class="note" style="margin:0">Aucune clôture envoyée pour l’instant.</p>'}</div>`+L.map(x=>{const t=CS[x.st];
-  return `<div class="card"><div class="row" style="padding-top:0"><span><b>${esc(x.date)}</b> · <span class="chip">${esc(x.plate)}</span><br><span class="note" style="margin:0">${esc(x.driver)}</span></span><span class="tag ${t[0]}">${t[1]}</span></div>${x.why?`<p class="note">Renvoi : ${esc(x.why)}</p>`:""}${sumRows(x.s)}${x.st==="soumise"?`<div class="btns"><button class="btn sun" data-a="rev" data-id="${x.id}" data-v="1">Valider</button><button class="btn ghost" data-a="rev" data-id="${x.id}" data-v="0">Renvoyer</button></div>`:""}</div>`}).join("");
-}
-
-function dayView(){
- if(!D.my)return `<div class="card"><h3>Ma journée</h3><p class="note" style="margin-top:0">Aucun véhicule ne t’est affecté pour l’instant. Demande à ton propriétaire de t’affecter un véhicule.</p></div>`;
- const v=D.my,ru=D.rule;
- let h=`<div class="card"><div class="row" style="padding-top:0"><span class="chip">${esc(v.plate)}</span><span class="note" style="margin:0">${esc(v.model||"")} · ${TN[v.transport_type]}${v.lines?" · "+esc(v.lines.name):""}</span></div><p class="note" style="margin-bottom:0">${ru?(ru.mode==="fixe"?"Versement fixe : "+fmt(ru.value)+" par jour":"Part du propriétaire : "+ru.value+" % du résultat"):"Aucun contrat défini pour ce véhicule."}</p></div>`;
- const al=(D.docs||[]).filter(d=>dl(d.due_date)<=5);if((D.docs||[]).length)h+=`<div class="card"${al.length?' style="border-color:var(--warn)"':""}><h3>Documents du véhicule</h3>${al.length?`<p class="note" style="margin:0 0 6px;color:var(--warn)"><b>Rappel :</b> à renouveler bientôt.</p>`:""}${docRows(D.docs)}</div>`;
- if(!D.day)return h+`<div class="card"><h3>Aujourd’hui</h3><div class="btns"><button class="btn sun" data-a="start">Commencer la journée</button></div></div>`;
- const st=D.clo?D.clo.status:"brouillon",open=st==="brouillon"||st==="renvoyee",t=CS[st],E=D.ents.concat(qget().filter(x=>x.work_day_id===D.day.id));
- h+=`<div class="card"><div class="row" style="padding-top:0"><h3 style="margin:0">Aujourd’hui</h3><span class="tag ${t[0]}">${t[1]}</span></div>${D.clo&&D.clo.return_reason?`<p class="note">Motif du renvoi : ${esc(D.clo.return_reason)}</p>`:""}`;
- h+=(E.length?E.map(e=>`<div class="row"><span>${esc(e.category)}${e.label?" – "+esc(e.label):""}</span><b>${e.entry_type==="recette"?"+":"−"} ${fmt(e.amount)}</b></div>`).join(""):`<p class="note">Aucune saisie.</p>`)+sumRows(calc(E,ru))+`</div>`;
- if(open)h+=`<div class="card"><h3>Nouvelle saisie</h3><label for="et">Type</label><select id="et"><option value="recette|Recette">Recette</option><optgroup label="Carburant"><option value="carburant|Essence">Essence</option><option value="carburant|Gasoil">Gasoil</option></optgroup><optgroup label="Autres dépenses"><option value="depense|Lavage">Lavage du véhicule</option><option value="depense|Parking">Parking</option><option value="depense|Péage">Péage</option><option value="depense|Crédit téléphonique">Crédit téléphonique</option><option value="depense|Réparation pneu">Réparation de pneu</option><option value="depense|Autre">Autre dépense</option></optgroup></select><label for="ea">Montant (FCFA)</label><input id="ea" type="number" min="1" inputmode="numeric"><label for="el">Précision (facultatif)</label><input id="el"><div class="btns"><button class="btn sun" data-a="addent">Enregistrer</button><button class="btn ghost" data-a="submit">Envoyer la clôture</button></div></div>`;
- h+=`<div class="card"><h3>Signaler un problème</h3><select id="mk"><option>Vidange</option><option>Pneu</option><option>Freins</option><option>Batterie</option><option>Autre panne</option></select><div class="btns"><button class="btn ghost" data-a="report">Envoyer au propriétaire</button></div></div>`;
- return h;
-}
-
-function view(){
- $("out").hidden=!user;
- if(!user){$("main").innerHTML=authView();return}
- const a=act(),pn=a&&a.role==="owner"?(reqs[a.owner_id]||[]).filter(r=>r.status==="pending").length:0,L0=pn?"Compte ("+pn+")":"Compte",T=!a?[["acc",L0]]:a.role==="driver"?[["day","Ma journée"],["acc",L0]]:a.role==="owner"?[["veh","Véhicules"],["clo","Clôtures"],["rep","Rapports"],["acc",L0]]:[["clo","Clôtures"],["veh","Véhicules"],["rep","Rapports"],["acc",L0]];
- if(!T.some(x=>x[0]===tab))tab=T[0][0];
- const nav=T.length>1?`<div class="seg" style="margin-bottom:12px">${T.map(x=>`<button class="btn ${tab===x[0]?"":"ghost"}" data-a="tab" data-v="${x[0]}">${x[1]}</button>`).join("")}</div>`:"";
- $("main").innerHTML=nav+(tab==="veh"?vehView():tab==="clo"?cloView():tab==="rep"?repView():tab==="day"?dayView():accView());
-}
-
-function authView(){
- const up=mode==="up";
- return `<div class="card"><div class="seg"><button class="btn ${up?"ghost":""}" data-a="mode" data-v="in">Se connecter</button><button class="btn ${up?"":"ghost"}" data-a="mode" data-v="up">Créer un compte</button></div>
+/* ---------- écrans ---------- */
+function authView(){const up=mode==="up";
+ return card("",`<div class="seg"><button class="btn ${up?"ghost":""}" data-a="mode" data-v="in">Se connecter</button><button class="btn ${up?"":"ghost"}" data-a="mode" data-v="up">Créer un compte</button></div>
  ${up?'<label for="fn">Nom complet</label><input id="fn" autocomplete="name">':""}
  <label for="em">Adresse e-mail</label><input id="em" type="email" autocomplete="email" inputmode="email">
  <label for="pw">Mot de passe</label><input id="pw" type="password" autocomplete="${up?"new-password":"current-password"}" placeholder="6 caractères minimum">
  <div class="btns"><button class="btn sun" data-a="${up?"signup":"signin"}">${up?"Créer mon compte":"Me connecter"}</button></div>
- <p class="note">Phase de test : la connexion se fait par e-mail. Le code SMS viendra plus tard.</p></div>`;
+ <p class="note">Phase de test : connexion par e-mail. Le code SMS viendra plus tard.</p>`)}
+
+function tabsList(){const T=[];
+ if(bid){
+  if(P.size){const pn=(D.mem||[]).filter(x=>x.status==="pending").length;
+   T.push(["eq","Équipe"+(pn&&can("member.manage")?" ("+pn+")":"")]);
+   if(can("vehicle.read"))T.push(["fl","Flotte"]);
+   if(can("settlement.review")||can("finance.read"))T.push(["cl","Clôtures"]);
+   if(can("ledger.read"))T.push(["cp","Comptes"]);
+   if(can("maintenance.read"))T.push(["en","Entretien"]);}
+  if(isDrv())T.push(["jr","Ma journée"],["mc","Mon compte"],["sg","Signaler"]);}
+ T.push(["pf","Profil"]);return T}
+
+function view(){
+ $("out").hidden=!user;
+ if(!user){$("main").innerHTML=authView();return}
+ const T=tabsList();if(!T.some(x=>x[0]===tab))tab=T[0][0];
+ const F={eq:equipe,fl:flotte,cl:clotures,cp:comptes,en:entretien,jr:journee,mc:monCompte,sg:signaler,pf:profil};
+ $("main").innerHTML=(T.length>1?`<div class="nav">${T.map(x=>`<button class="btn ${tab===x[0]?"":"ghost"}" data-a="tab" data-v="${x[0]}">${x[1]}</button>`).join("")}</div>`:"")+F[tab]();
 }
 
-async function run(btn,fn){
- if(busy)return;busy=true;if(btn)btn.disabled=true;
- try{await fn()}catch(e){toast(msg(e))}
- busy=false;if(btn)btn.disabled=false;
-}
+function equipe(){
+ const b=(mems.find(x=>x.business_id===bid&&x.status==="active")||{}).business_accounts||{};
+ const M=D.mem||[],pend=M.filter(x=>x.status==="pending"),act=M.filter(x=>x.status==="active");
+ const free=(D.veh||[]).filter(v=>!(D.asg||[]).some(a=>a.vehicle_id===v.id));
+ let h=card(esc(b.name),can("member.manage")?`<div class="note" style="margin-top:0">Code à donner à ton équipe :</div><div class="code">${esc(b.code)}</div>`:none("Espace de l’entreprise."));
+ h+=card("Demandes",pend.length?pend.map(r=>`<div class="row"><span><b>${esc(nameOf(r.user_id))}</b><br><span class="note" style="margin:0">${RN[r.role]}</span></span>`+(can("member.manage")?`<span class="col">${r.role==="driver"&&can("assignment.write")&&free.length?sel("fv"+r.id,free.map(v=>[v.id,v.plate]))+`<button class="btn sun sm" data-a="accasg" data-id="${r.id}" data-u="${r.user_id}">Accepter et affecter</button>`:`<button class="btn sun sm" data-a="acc" data-id="${r.id}" data-v="active">Accepter</button>`}<button class="btn ghost sm" data-a="acc" data-id="${r.id}" data-v="suspended">Refuser</button></span>`:"")+`</div>`).join(""):none("Aucune demande."));
+ h+=card("Équipe",act.map(r=>`<div class="row"><span>${esc(nameOf(r.user_id))}</span>${tag(["t-ok",RN[r.role]])}</div>`).join("")||none("—"));
+ return h}
 
+function flotte(){
+ const V=D.veh||[],drv=(D.mem||[]).filter(x=>x.role==="driver"&&x.status==="active");let h="";
+ if(can("vehicle.write"))h+=card("Ajouter un véhicule",`<label for="vp">Plaque</label><input id="vp" placeholder="5821 GH 01"><label for="vk">Marque</label><input id="vk" placeholder="Toyota"><label for="vm">Modèle</label><input id="vm" placeholder="Corolla"><label for="vt">Type de transport</label>${sel("vt",Object.keys(TN).map(k=>[k,TN[k]]))}<label for="vf">Carburant</label>${sel("vf",[["","—"],["essence","Essence"],["gasoil","Gasoil"],["hybride","Hybride"],["electrique","Électrique"]])}<label for="vl">Ligne (Gbaka et Wôrô-wôrô seulement)</label><input id="vl" placeholder="Ex. Yopougon – Adjamé"><div class="btns"><button class="btn sun" data-a="addveh">Ajouter</button></div>`);
+ if(!V.length)h+=card("",none("Aucun véhicule pour l’instant."));
+ V.forEach((v,i)=>{const as=(D.asg||[]).find(x=>x.vehicle_id===v.id),co=(D.con||[]).find(x=>x.vehicle_id===v.id),ln=(D.lines||[]).find(x=>x.id===v.line_id);
+  let c=`<div class="row" style="padding-top:0"><span class="chip">${esc(v.plate)}</span><span class="note" style="margin:0">${esc([v.make,v.model].filter(Boolean).join(" "))} · ${TN[v.transport_type]}${ln?" · "+esc(ln.name):""}</span></div>`;
+  c+=`<div class="row"><span>Chauffeur</span><span>`+(as?`<b>${esc(nameOf(as.driver_id))}</b>`+(can("assignment.write")?` <button class="btn ghost sm" data-a="unasg" data-id="${as.id}">Retirer</button>`:""):(can("assignment.write")&&drv.length?sel("as"+i,[["","Choisir…"]].concat(drv.map(d=>[d.user_id,nameOf(d.user_id)])))+` <button class="btn sun sm" data-a="asg" data-v="${v.id}" data-i="${i}">Affecter</button>`:none("Non affecté")))+`</span></div>`;
+  if(can("contract.write"))c+=`<label>Contrat</label><div class="seg">${sel("cm"+i,[["fixed","Fixe"],["percentage","Pourcentage"],["mixed","Mixte"]],co&&co.mode)}${sel("cd"+i,[["day","Par jour"],["week","Par semaine"]],co&&co.period)}</div><div class="seg" style="margin-top:6px"><input id="cf${i}" type="number" min="0" placeholder="Montant FCFA" value="${co&&co.fixed_amount!=null?co.fixed_amount:""}"><input id="cp${i}" type="number" min="0" max="100" placeholder="Part %" value="${co&&co.percentage!=null?co.percentage:""}"></div><div class="seg" style="margin-top:6px"><input id="cr${i}" type="number" min="0" max="6" placeholder="Jours de repos / semaine" value="${co?co.rest_days_per_week:""}"></div><label><input type="checkbox" id="cc${i}"${!co||co.carry_over_arrears?" checked":""}>Garder l’écart en dette si le résultat ne couvre pas la somme due</label><div class="btns"><button class="btn ghost sm" data-a="con" data-v="${v.id}" data-i="${i}">Enregistrer le contrat</button></div>`;
+  else if(can("contract.read"))c+=`<div class="row"><span>Contrat</span><b>${co?(co.mode==="fixed"?fmt(co.fixed_amount):co.mode==="percentage"?co.percentage+" %":fmt(co.fixed_amount)+" + "+co.percentage+" %"):"—"}</b></div>`;
+  c+=docRows((D.docs||[]).filter(d=>d.target_id===v.id));
+  if(can("document.write"))c+=`<div class="seg" style="margin-top:8px">${sel("dt"+i,Object.keys(DOCT).map(k=>[k,DOCT[k]]))}<input id="dd${i}" type="date"></div><div class="btns"><button class="btn ghost sm" data-a="adddoc" data-v="${v.id}" data-i="${i}">Ajouter le document</button></div>`;
+  h+=card("",c)});
+ return h}
+
+function clotures(){
+ const S=D.set||[];
+ return card("Clôtures des journées",S.length?"":none("Aucune clôture envoyée pour l’instant."))+S.map(s=>{const h=D.sh[s.shift_id]||{};
+  return card("",`<div class="row" style="padding-top:0"><span><b>${esc(h.shift_date||"")}</b> · <span class="chip">${esc(plateOf(h.vehicle_id))}</span><br><span class="note" style="margin:0">${esc(nameOf(h.driver_id))}</span></span>${tag(CS[s.status])}</div>${s.return_reason?`<p class="note">Renvoi : ${esc(s.return_reason)}</p>`:""}<div class="row"><span>Résultat</span><b>${fmt(s.net)}</b></div><div class="row"><span>Dû au propriétaire</span><b>${fmt(s.due_owner)}</b></div><div class="row"><span>Reste au chauffeur</span><b>${fmt(s.driver_balance)}</b></div>${s.status==="submitted"&&can("settlement.review")?`<div class="btns"><button class="btn sun" data-a="rv" data-id="${s.shift_id}" data-v="1">Valider</button><button class="btn ghost" data-a="rv" data-id="${s.shift_id}" data-v="0">Renvoyer</button></div>`:""}`)}).join("")}
+
+function comptes(){
+ const drv=(D.mem||[]).filter(x=>x.role==="driver"&&x.status==="active"),bal={};(D.led||[]).forEach(x=>bal[x.driver_id]=(bal[x.driver_id]||0)+(+x.amount));
+ let h=card("Compte courant des chauffeurs",(drv.length?drv.map(d=>{const b=bal[d.user_id]||0;return `<div class="row"><span>${esc(nameOf(d.user_id))}</span><b class="${b>0?"neg":""}">${b>0?"doit ":b<0?"crédit ":""}${fmt(Math.abs(b))}</b></div>`}).join(""):none("Aucun chauffeur actif."))+`<p class="note">Somme positive : le chauffeur doit encore cette somme au propriétaire.</p>`);
+ const P2=D.pay||[];
+ if(P2.length)h+=card("Versements à confirmer",P2.map(p=>`<div class="row"><span>${esc(nameOf(p.driver_id))}<br><span class="note" style="margin:0">${p.kind==="advance"?"Avance":"Versement"} · ${esc(p.method)}</span></span><span class="col"><b>${fmt(p.amount)}</b><button class="btn sun sm" data-a="cfp" data-id="${p.id}">Confirmer</button></span></div>`).join(""));
+ if(can("payment.record")&&drv.length)h+=card("Enregistrer un mouvement",`<label for="rd">Chauffeur</label>${sel("rd",drv.map(d=>[d.user_id,nameOf(d.user_id)]))}<label for="ra">Montant (FCFA)</label><input id="ra" type="number" min="1" inputmode="numeric"><label for="rm">Moyen</label>${sel("rm",[["cash","Espèces"],["mobile_money","Paiement mobile"],["bank","Banque"],["other","Autre"]])}<div class="btns"><button class="btn sun" data-a="rp" data-k="owner_payment">Versement reçu</button><button class="btn ghost" data-a="rp" data-k="advance">Avance donnée</button></div>`);
+ return h}
+
+function entretien(){
+ const M=D.mnt||[];
+ return card("Maintenance",M.length?M.map(x=>`<div class="row"><span><b>${esc(x.kind)}</b><br><span class="note" style="margin:0">${esc(plateOf(x.vehicle_id))}${x.release_decision==="released"?" · remis en circulation":x.release_decision==="kept_out"?" · immobilisé":""}</span></span><span class="col">${tag(MS[x.status])}${can("maintenance.write")&&NEXT[x.status]?`<button class="btn ghost sm" data-a="mn" data-id="${x.id}" data-v="${NEXT[x.status]}">${NEXTL[x.status]}</button>`:""}${can("maintenance.release")&&x.release_decision==="pending"&&(x.status==="done"||x.status==="in_progress")?`<button class="btn sun sm" data-a="rl" data-id="${x.id}" data-u="${x.vehicle_id}" data-v="released">Remettre en circulation</button><button class="btn ghost sm" data-a="rl" data-id="${x.id}" data-u="${x.vehicle_id}" data-v="kept_out">Garder immobilisé</button>`:""}</span></div>`).join(""):none("Aucun problème signalé."))}
+
+function journee(){
+ if(!D.my)return card("Ma journée",none("Aucun véhicule ne t’est affecté pour l’instant. Demande à ton propriétaire de t’affecter un véhicule."));
+ const v=D.my,ru=D.rule,qs=qget().filter(x=>D.shift&&x.row.shift_id===D.shift.id);
+ let h=card("",`<div class="row" style="padding-top:0"><span class="chip">${esc(v.plate)}</span><span class="note" style="margin:0">${esc([v.make,v.model].filter(Boolean).join(" "))} · ${TN[v.transport_type]}${D.line?" · "+esc(D.line.name):""}</span></div><p class="note" style="margin-bottom:0">${ru?(ru.mode==="fixed"?"Versement fixe : "+fmt(ru.fixed_amount)+(ru.period==="week"?" par semaine":" par jour"):ru.mode==="percentage"?"Part du propriétaire : "+ru.percentage+" % du résultat":"Fixe "+fmt(ru.fixed_amount)+" + "+ru.percentage+" % du surplus"):"Aucun contrat défini pour ce véhicule."}</p>`);
+ const al=(D.ddocs||[]).filter(d=>d.expires_on&&dl(d.expires_on)<=5);
+ if((D.ddocs||[]).length)h+=`<div class="card"${al.length?' style="border-color:var(--sun)"':""}><h3>Documents du véhicule</h3>${al.length?`<p class="note" style="margin:0 0 6px;color:var(--warn)"><b>Rappel :</b> à renouveler bientôt.</p>`:""}${docRows(D.ddocs)}</div>`;
+ if(!D.shift)return h+card("Aujourd’hui",`<label for="sk">Kilométrage de départ (facultatif)</label><input id="sk" type="number" min="0" inputmode="numeric"><div class="btns"><button class="btn sun" data-a="start">Commencer la journée</button></div>`);
+ const st=D.st?D.st.status:"draft",open=st==="draft"||st==="returned";
+ const R=D.rev.concat(qs.filter(x=>x.t==="revenues").map(x=>x.row)),E=D.exp.concat(qs.filter(x=>x.t==="expenses").map(x=>x.row));
+ const g=R.reduce((s,x)=>s+x.amount,0),e=E.filter(x=>x.status!=="rejected").reduce((s,x)=>s+x.amount,0),net=g-e,due=dueOf(net,ru);
+ const lines=R.map(x=>`<div class="row"><span>Recette${x.source&&x.source!=="course"?" ("+esc(x.source)+")":""}${x.id&&qs.some(q=>q.row.id===x.id)?" · en attente":""}</span><b>+ ${fmt(x.amount)}</b></div>`).concat(E.map(x=>`<div class="row"><span>${esc(CAT[x.category]||x.category)}${x.note?" – "+esc(x.note):""}${x.status==="rejected"?" · rejetée":""}${qs.some(q=>q.row.id===x.id)?" · en attente":""}</span><b>− ${fmt(x.amount)}</b></div>`));
+ h+=card("",`<div class="row" style="padding-top:0"><h3 style="margin:0">Aujourd’hui</h3>${tag(CS[st])}</div>${D.st&&D.st.return_reason?`<p class="note">Motif du renvoi : ${esc(D.st.return_reason)}</p>`:""}${lines.join("")||none("Aucune saisie.")}<div class="row"><span>Résultat</span><b>${fmt(net)}</b></div><div class="row"><span>Dû au propriétaire</span><b>${fmt(due)}</b></div><div class="row"><span>Reste pour toi</span><b>${fmt(net-due)}</b></div>`);
+ if(open)h+=card("Nouvelle saisie",`<label for="et">Type</label><select id="et"><optgroup label="Recette"><option value="rev|course">Recette (course)</option><option value="rev|tour">Recette (tour de ligne)</option><option value="rev|autre">Autre recette</option></optgroup><optgroup label="Dépenses">${Object.keys(CAT).map(k=>`<option value="exp|${k}">${CAT[k]}</option>`).join("")}</optgroup></select><label for="ea">Montant (FCFA)</label><input id="ea" type="number" min="1" inputmode="numeric"><label for="el">Précision (facultatif)</label><input id="el"><div class="btns"><button class="btn sun" data-a="ent">Enregistrer</button><button class="btn ghost" data-a="sub">Envoyer la clôture</button></div>`);
+ return h}
+
+function monCompte(){
+ const b=D.dBal||0;
+ return card("Mon compte",`<div class="big">${fmt(Math.abs(b))}</div><p class="note" style="margin-top:4px">${b>0?"Tu dois encore cette somme au propriétaire.":b<0?"Le propriétaire te doit cette somme.":"Tu es à jour."}</p>`)+
+  card("Déclarer un versement",`<label for="da">Montant (FCFA)</label><input id="da" type="number" min="1" inputmode="numeric"><label for="dm">Moyen</label>${sel("dm",[["cash","Espèces"],["mobile_money","Paiement mobile"],["bank","Banque"],["other","Autre"]])}<div class="btns"><button class="btn sun" data-a="dp">Déclarer</button></div><p class="note">Le propriétaire ou le comptable confirme ensuite le versement.</p>`)+
+  card("Derniers versements",(D.dPay||[]).length?D.dPay.map(p=>`<div class="row"><span>${p.kind==="advance"?"Avance reçue":"Versement"}</span><span class="col"><b>${fmt(p.amount)}</b>${tag(p.acknowledged_at?["t-ok","Confirmé"]:["t-warn","À confirmer"])}</span></div>`).join(""):none("Aucun versement."))}
+
+function signaler(){
+ if(!D.my)return card("Signaler",none("Aucun véhicule affecté."));
+ return card("Signaler une panne ou un entretien",`<label for="mk">Type</label>${sel("mk",["Vidange","Pneu","Freins","Batterie","Autre panne"].map(x=>[x,x]))}<div class="btns"><button class="btn sun" data-a="rpt">Envoyer au propriétaire</button></div>`)+
+  card("Déclarer un incident",`<label for="it">Type</label>${sel("it",[["accident","Accident"],["police_check","Contrôle de police"],["theft","Vol"],["dispute","Litige"],["breakdown","Panne en route"],["other","Autre"]])}<label for="is">Gravité</label>${sel("is",[["1","Légère"],["2","Importante"],["3","Grave"]])}<label for="ix">Description</label><input id="ix"><div class="btns"><button class="btn sun" data-a="inc">Déclarer</button></div>`)}
+
+function profil(){
+ const nm=(user.user_metadata||{}).full_name||"";
+ let h=card(esc(nm||"Mon profil"),`<div class="note" style="margin-top:0">${esc(user.email)}</div>`);
+ if(mems.length)h+=card("Mes espaces",mems.map(m=>`<div class="row"><span><b>${esc((m.business_accounts||{}).name||"")}</b><br><span class="note" style="margin:0">${RN[m.role]}</span></span><span class="col">${tag(m.status==="active"?["t-ok","Actif"]:m.status==="pending"?["t-warn","En attente"]:["t-bad","Refusé"])}${m.status==="active"&&m.business_id!==bid?`<button class="btn ghost sm" data-a="sw" data-v="${m.business_id}">Ouvrir</button>`:""}</span></div>`).join(""));
+ if(!mems.some(m=>m.role==="owner"))h+=card("Je suis propriétaire",`<label for="on">Nom de ton entreprise ou activité</label><input id="on" placeholder="Ex. Transports Kouassi"><div class="btns"><button class="btn sun" data-a="nb">Créer mon espace</button></div>`);
+ h+=card("Je rejoins un propriétaire",`<label for="jc">Code du propriétaire</label><input id="jc" placeholder="PROP-XXXXXX" autocapitalize="characters"><label for="jr">Mon rôle</label>${sel("jr",[["driver","Chauffeur"],["fleet_manager","Gestionnaire de flotte"],["accountant","Comptable"],["technician","Technicien"]])}<div class="btns"><button class="btn sun" data-a="jb">Envoyer ma demande</button></div>`);
+ return h}
+
+/* ---------- actions ---------- */
+async function run(btn,fn){if(busy)return;busy=true;if(btn)btn.disabled=true;try{await fn()}catch(e){toast(msg(e))}busy=false;if(btn)btn.disabled=false}
+const ok=(r,m)=>{if(r.error)throw r.error;if(m)toast(m)};
 $("main").addEventListener("click",e=>{
- const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a;
- if(a==="mode"){mode=b.dataset.v;view();return}
- if(a==="tab"){tab=b.dataset.v;view();return}
+ const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a,d=b.dataset,v=id=>$(id).value;
+ if(a==="mode"){mode=d.v;view();return}
+ if(a==="tab"){tab=d.v;view();return}
  run(b,async()=>{
   if(a==="signin"||a==="signup"){
-   const em=$("em").value.trim(),pw=$("pw").value;
-   if(!em||!pw){toast("Renseigne l’e-mail et le mot de passe.");return}
-   if(a==="signup"){
-    const fn=$("fn").value.trim();if(!fn){toast("Renseigne ton nom.");return}
-    const r=await sb.auth.signUp({email:em,password:pw,options:{data:{full_name:fn}}});
-    if(r.error)throw r.error;
-    if(!r.data.session){toast("Compte créé. Confirme ton e-mail puis connecte-toi.");mode="in";view();return}
-    user=r.data.session.user;
-   }else{
-    const r=await sb.auth.signInWithPassword({email:em,password:pw});
-    if(r.error)throw r.error;user=r.data.user;
-   }
-   await load();
-  }else if(a==="own"){
-   const n=$("on").value.trim();if(!n){toast("Renseigne le nom de ton entreprise.");return}
-   const r=await sb.rpc("create_owner",{p_name:n});if(r.error)throw r.error;
-   toast("Espace créé.");await load();
-  }else if(a==="join"){
-   const c=$("jc").value.trim();if(!c){toast("Renseigne le code du propriétaire.");return}
-   const r=await sb.rpc("join_owner",{p_code:c,p_role:$("jr").value});if(r.error)throw r.error;
-   toast("Demande envoyée.");await load();
-  }else if(a==="dec"){
-   const r=await sb.from("memberships").update({status:b.dataset.v}).eq("id",b.dataset.id).select();
-   if(r.error)throw r.error;if(!r.data.length)throw new Error("Action refusée.");
-   toast(b.dataset.v==="active"?"Demande acceptée.":"Demande refusée.");await load();
-  }else if(a==="addveh"){
-   const o=act().owner_id,pl=$("vp").value.trim(),ty=$("vt").value,ln=$("vl").value.trim();let lid=null;
-   if(!pl){toast("Renseigne la plaque.");return}
+   const em=v("em").trim(),pw=v("pw");if(!em||!pw){toast("Renseigne l’e-mail et le mot de passe.");return}
+   if(a==="signup"){const fn=v("fn").trim();if(!fn){toast("Renseigne ton nom.");return}
+    const r=await sb.auth.signUp({email:em,password:pw,options:{data:{full_name:fn}}});if(r.error)throw r.error;
+    if(!r.data.session){toast("Compte créé. Confirme ton e-mail puis connecte-toi.");mode="in";view();return}user=r.data.session.user}
+   else{const r=await sb.auth.signInWithPassword({email:em,password:pw});if(r.error)throw r.error;user=r.data.user}
+   await load();return}
+  if(a==="nb"){const n=v("on").trim();if(!n){toast("Renseigne le nom de ton entreprise.");return}ok(await sb.rpc("create_business",{p_name:n}),"Espace créé.");tab=null;await load();return}
+  if(a==="jb"){const c=v("jc").trim();if(!c){toast("Renseigne le code du propriétaire.");return}ok(await sb.rpc("join_business",{p_code:c,p_role:v("jr")}),"Demande envoyée.");await load();return}
+  if(a==="sw"){localStorage.setItem("tm-biz",d.v);tab=null;await load();return}
+  if(a==="acc"){const r=await sb.from("business_memberships").update({status:d.v}).eq("id",d.id).select();if(r.error)throw r.error;if(!r.data.length)throw new Error("Action refusée.");toast(d.v==="active"?"Demande acceptée.":"Demande refusée.");await load();return}
+  if(a==="accasg"){const r1=await sb.from("business_memberships").update({status:"active"}).eq("id",d.id).select();if(r1.error)throw r1.error;if(!r1.data.length)throw new Error("Action refusée.");
+   ok(await sb.from("vehicle_assignments").insert({business_id:bid,vehicle_id:v("fv"+d.id),driver_id:d.u,confirmed_by:user.id}),"Chauffeur accepté et affecté.");await load();return}
+  if(a==="addveh"){const pl=v("vp").trim(),ty=v("vt"),ln=v("vl").trim();let lid=null;if(!pl){toast("Renseigne la plaque.");return}
    if(ty==="gbaka"||ty==="woro"){if(!ln){toast("Renseigne la ligne.");return}
-    const q=await sb.from("lines").select("id").eq("owner_id",o).eq("name",ln).eq("transport_type",ty).limit(1);lid=q.data&&q.data[0]&&q.data[0].id;
-    if(!lid){const i=await sb.from("lines").insert({owner_id:o,name:ln,transport_type:ty}).select("id").single();if(i.error)throw i.error;lid=i.data.id}}
-   const r=await sb.from("vehicles").insert({owner_id:o,plate:pl,model:$("vm").value.trim()||null,transport_type:ty,line_id:lid});if(r.error)throw r.error;
-   toast("Véhicule ajouté.");await load();
-  }else if(a==="asg"){
-   const dr=$("as"+b.dataset.i).value;if(!dr){toast("Choisis un chauffeur.");return}
-   const r=await sb.from("assignments").insert({owner_id:act().owner_id,vehicle_id:b.dataset.v,driver_id:dr,confirmed_by:user.id});if(r.error)throw r.error;
-   toast("Chauffeur affecté.");await load();
-  }else if(a==="unasg"){
-   const r=await sb.from("assignments").update({ends_on:today()}).eq("id",b.dataset.id);if(r.error)throw r.error;
-   toast("Affectation retirée.");await load();
-  }else if(a==="con"){
-   const i=b.dataset.i,mo=$("cm"+i).value,val=+$("cv"+i).value;
-   if(!(val>=0)||$("cv"+i).value===""||(mo==="pourcentage"&&val>100)){toast("Valeur du contrat invalide.");return}
-   const ex=(D.con||[]).find(c=>c.vehicle_id===b.dataset.v);
-   const r=ex?await sb.from("contracts").update({mode:mo,value:val}).eq("id",ex.id):await sb.from("contracts").insert({owner_id:act().owner_id,vehicle_id:b.dataset.v,mode:mo,value:val});
-   if(r.error)throw r.error;toast("Contrat enregistré.");await load();
-  }else if(a==="start"){
-   const r=await sb.from("work_days").insert({owner_id:act().owner_id,vehicle_id:D.my.id,driver_id:user.id,work_date:today()});if(r.error)throw r.error;
-   await load();
-  }else if(a==="addent"){
-   const p=$("et").value.split("|"),am=Math.round(+$("ea").value);if(!(am>0)){toast("Montant invalide.");return}
-   const row={id:crypto.randomUUID(),work_day_id:D.day.id,entry_type:p[0],category:p[1],label:$("el").value.trim()||null,amount:am};
-   let ok=navigator.onLine;if(ok){const r=await sb.from("entries").insert(row);if(r.error){if(/fetch|network/i.test(r.error.message))ok=false;else throw r.error}}
-   if(!ok){qset(qget().concat(row));toast("Pas de réseau : saisie gardée sur le téléphone.");view();return}
-   toast("Saisie enregistrée.");await load();
-  }else if(a==="submit"){
-   if(!confirm("Envoyer la clôture ? Tu ne pourras plus modifier la journée."))return;
+    const q=await sb.from("transport_lines").select("id").eq("business_id",bid).eq("name",ln).eq("transport_type",ty).limit(1);lid=q.data&&q.data[0]&&q.data[0].id;
+    if(!lid){const i=await sb.from("transport_lines").insert({business_id:bid,name:ln,transport_type:ty}).select("id").single();if(i.error)throw i.error;lid=i.data.id}}
+   ok(await sb.from("vehicles").insert({business_id:bid,plate:pl,make:v("vk").trim()||null,model:v("vm").trim()||null,transport_type:ty,fuel_type:v("vf")||null,line_id:lid}),"Véhicule ajouté.");await load();return}
+  if(a==="asg"){const dr=v("as"+d.i);if(!dr){toast("Choisis un chauffeur.");return}ok(await sb.from("vehicle_assignments").insert({business_id:bid,vehicle_id:d.v,driver_id:dr,confirmed_by:user.id}),"Chauffeur affecté.");await load();return}
+  if(a==="unasg"){ok(await sb.from("vehicle_assignments").update({ends_on:today()}).eq("id",d.id),"Affectation retirée.");await load();return}
+  if(a==="con"){const i=d.i,mo=v("cm"+i),fx=v("cf"+i),pc=v("cp"+i);
+   if(mo!=="percentage"&&!(fx!==""&&+fx>=0)||mo!=="fixed"&&!(pc!==""&&+pc>=0&&+pc<=100)){toast("Montant ou pourcentage invalide.");return}
+   const row={mode:mo,period:v("cd"+i),fixed_amount:mo==="percentage"?null:+fx,percentage:mo==="fixed"?null:+pc,rest_days_per_week:+v("cr"+i)||0,carry_over_arrears:$("cc"+i).checked},ex=(D.con||[]).find(c=>c.vehicle_id===d.v);
+   ok(ex?await sb.from("contracts").update(row).eq("id",ex.id):await sb.from("contracts").insert(Object.assign({business_id:bid,vehicle_id:d.v},row)),"Contrat enregistré.");await load();return}
+  if(a==="adddoc"){const dt=v("dd"+d.i);if(!dt){toast("Choisis la date d’échéance.");return}
+   ok(await sb.from("documents").insert({business_id:bid,target_type:"vehicle",target_id:d.v,doc_type:v("dt"+d.i),expires_on:dt,uploaded_by:user.id}),"Document ajouté.");await load();return}
+  if(a==="rv"){const yes=d.v==="1";let why=null;if(!yes){why=prompt("Motif du renvoi (obligatoire) :");if(!why||!why.trim())return}
+   ok(await sb.rpc("review_settlement",{sid:d.id,approve:yes,reason:why}),yes?"Clôture validée.":"Clôture renvoyée.");await load();return}
+  if(a==="cfp"){const r=await sb.from("payments").update({acknowledged_at:new Date().toISOString(),received_by:user.id}).eq("id",d.id).select();if(r.error)throw r.error;if(!r.data.length)throw new Error("Action refusée.");toast("Versement confirmé.");await load();return}
+  if(a==="rp"){const am=Math.round(+v("ra"));if(!(am>0)){toast("Montant invalide.");return}const dr=v("rd");
+   ok(await sb.from("payments").insert({id:uid(),business_id:bid,driver_id:dr,kind:d.k,method:v("rm"),amount:am,paid_by:d.k==="owner_payment"?dr:user.id}),d.k==="owner_payment"?"Versement enregistré.":"Avance enregistrée.");await load();return}
+  if(a==="mn"){ok(await sb.from("maintenance_orders").update({status:d.v}).eq("id",d.id));await load();return}
+  if(a==="rl"){ok(await sb.from("maintenance_orders").update({release_decision:d.v}).eq("id",d.id));
+   if(can("vehicle.write"))await sb.from("vehicles").update({status:d.v==="released"?"available":"immobilised"}).eq("id",d.u);toast("Décision enregistrée.");await load();return}
+  if(a==="start"){const k=v("sk");ok(await sb.from("shifts").insert({business_id:bid,vehicle_id:D.my.id,driver_id:user.id,shift_date:today(),started_at:new Date().toISOString(),start_km:k?+k:null}));await load();return}
+  if(a==="ent"){const p=v("et").split("|"),am=Math.round(+v("ea"));if(!(am>0)){toast("Montant invalide.");return}const note=v("el").trim()||null;
+   const it=p[0]==="rev"?{t:"revenues",row:{id:uid(),business_id:bid,shift_id:D.shift.id,amount:am,source:p[1]}}:{t:"expenses",row:{id:uid(),business_id:bid,shift_id:D.shift.id,vehicle_id:D.my.id,category:p[1],amount:am,note:note,created_by:user.id}};
+   let good=navigator.onLine;if(good){const r=await sb.from(it.t).insert(it.row);if(r.error){if(/fetch|network/i.test(r.error.message))good=false;else throw r.error}}
+   if(!good){qset(qget().concat(it));toast("Pas de réseau : saisie gardée sur le téléphone.");view();return}
+   toast("Saisie enregistrée.");await load();return}
+  if(a==="sub"){if(!confirm("Envoyer la clôture ? Tu ne pourras plus modifier la journée."))return;
    await flush();if(qget().length){toast("Des saisies attendent le réseau. Réessaie quand il revient.");return}
-   const r=await sb.rpc("submit_closure",{p_day:D.day.id});if(r.error)throw r.error;toast("Clôture envoyée.");await load();
-  }else if(a==="rev"){
-   const ok=b.dataset.v==="1";let why=null;
-   if(!ok){why=prompt("Motif du renvoi (obligatoire) :");if(!why||!why.trim())return}
-   const r=await sb.rpc("review_closure",{p_day:b.dataset.id,p_approve:ok,p_reason:why});if(r.error)throw r.error;
-   toast(ok?"Clôture validée.":"Clôture renvoyée.");await load();
-  }else if(a==="adddoc"){
-   const i=b.dataset.i,d=$("dd"+i).value;if(!d){toast("Choisis la date d’échéance.");return}
-   const r=await sb.from("vehicle_documents").insert({owner_id:act().owner_id,vehicle_id:b.dataset.v,doc_type:$("dt"+i).value,due_date:d});if(r.error)throw r.error;
-   toast("Document ajouté.");await load();
-  }else if(a==="report"){
-   const r=await sb.from("maintenance").insert({owner_id:act().owner_id,vehicle_id:D.my.id,kind:$("mk").value,reported_by:user.id});if(r.error)throw r.error;
-   toast("Problème signalé au propriétaire.");
-  }else if(a==="mt"){
-   const r=await sb.from("maintenance").update({status:b.dataset.v}).eq("id",b.dataset.id);if(r.error)throw r.error;await load();
-  }else if(a==="accasg"){
-   const vid=$("fv"+b.dataset.id).value;
-   const r1=await sb.from("memberships").update({status:"active"}).eq("id",b.dataset.id).select();if(r1.error)throw r1.error;if(!r1.data.length)throw new Error("Action refusée.");
-   const r2=await sb.from("assignments").insert({owner_id:act().owner_id,vehicle_id:vid,driver_id:b.dataset.u,confirmed_by:user.id});if(r2.error)throw r2.error;
-   toast("Chauffeur accepté et affecté.");await load();
-  }
+   ok(await sb.rpc("submit_settlement",{sid:D.shift.id}),"Clôture envoyée.");await load();return}
+  if(a==="dp"){const am=Math.round(+v("da"));if(!(am>0)){toast("Montant invalide.");return}
+   ok(await sb.from("payments").insert({id:uid(),business_id:bid,driver_id:user.id,kind:"owner_payment",method:v("dm"),amount:am,paid_by:user.id}),"Versement déclaré.");await load();return}
+  if(a==="rpt"){ok(await sb.from("maintenance_orders").insert({business_id:bid,vehicle_id:D.my.id,kind:v("mk"),reported_by:user.id}),"Problème signalé.");return}
+  if(a==="inc"){ok(await sb.from("incidents").insert({business_id:bid,vehicle_id:D.my.id,type:v("it"),severity:+v("is"),description:v("ix").trim()||null,reported_by:user.id}),"Incident déclaré.");return}
  });
 });
-$("out").onclick=()=>run($("out"),async()=>{await sb.auth.signOut();user=null;mem=[];view()});
+$("out").onclick=()=>run($("out"),async()=>{await sb.auth.signOut();user=null;mems=[];bid=null;D={};view()});
 
-if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
-setInterval(()=>{if(!user||busy||document.hidden||!navigator.onLine)return;const f=document.activeElement;if(f&&/INPUT|SELECT|TEXTAREA/.test(f.tagName))return;
- if([...document.querySelectorAll("#main input")].some(i=>i.value!==i.defaultValue))return;load()},15000);
+addEventListener("offline",()=>toast("Hors connexion : tes saisies seront gardées sur le téléphone."));
 addEventListener("online",()=>flush().then(load));
+setInterval(()=>{if(!user||busy||document.hidden||!navigator.onLine)return;const f=document.activeElement;if(f&&/INPUT|SELECT|TEXTAREA/.test(f.tagName))return;
+ if([...document.querySelectorAll("#main input")].some(i=>i.type!=="checkbox"&&i.value!==i.defaultValue))return;load()},15000);
 addEventListener("visibilitychange",()=>{if(!document.hidden&&user&&!busy)load()});
+if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 init();
 </script>
 </body>

@@ -1,12 +1,13 @@
 {
  "name": "EDSP-ESPACE TRANSPORT",
  "short_name": "EDSP Transport",
+ "description": "TRANSPORT MANAGER",
  "lang": "fr",
  "start_url": "./index.html",
  "scope": "./",
  "display": "standalone",
- "background_color": "#22313a",
- "theme_color": "#22313a",
+ "background_color": "#007A4D",
+ "theme_color": "#007A4D",
  "icons": [
   {
    "src": "icon-192.png",
@@ -21,10 +22,16 @@
    "purpose": "any"
   },
   {
-   "src": "icon-512.png",
+   "src": "icon-maskable-512.png",
    "sizes": "512x512",
    "type": "image/png",
    "purpose": "maskable"
+  },
+  {
+   "src": "icon.svg",
+   "sizes": "any",
+   "type": "image/svg+xml",
+   "purpose": "any"
   }
  ]
 }

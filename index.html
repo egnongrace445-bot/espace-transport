@@ -3,22 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#007A4D">
+<meta name="theme-color" content="#03326E">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>EDSP – ESPACE TRANSPORT</title>
 <style>
-:root{--bg:#f1f4f1;--card:#fff;--ink:#1b2a24;--mute:#5a6b63;--line:#d8e0da;--brand:#007A4D;--brand2:#00935C;--sun:#F77F00;--okbg:#dcf3e8;--badbg:#fbe1dc;--warnbg:#fdecd0;--ok:#0b7a4b;--bad:#b8352a;--warn:#a85f00;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root{--bg:#0f1713;--card:#18231e;--ink:#e9f0ec;--mute:#9db0a6;--line:#2a3a32;--brand:#00573a;--brand2:#006f48;--okbg:#14382a;--badbg:#42221e;--warnbg:#41300f;--ok:#55c595;--bad:#ef8b7f;--warn:#f0b955}}
+:root{--bg:#f1f4f1;--card:#fff;--ink:#1b2a24;--mute:#5a6b63;--line:#d8e0da;--brand:#03326E;--brand2:#01478D;--sun:#97D010;--okbg:#dcf3e8;--badbg:#fbe1dc;--warnbg:#fdecd0;--ok:#0b7a4b;--bad:#b8352a;--warn:#a85f00;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1713;--card:#18231e;--ink:#e9f0ec;--mute:#9db0a6;--line:#2a3a32;--brand:#021f45;--brand2:#033a75;--okbg:#14382a;--badbg:#42221e;--warnbg:#41300f;--ok:#55c595;--bad:#ef8b7f;--warn:#f0b955}}
 *{box-sizing:border-box}html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
 h1,h2,h3{margin:0;letter-spacing:-.01em}
 .app{max-width:560px;margin:0 auto;padding-bottom:40px}
-header{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:4px solid var(--sun)}
-header svg{width:40px;height:40px;flex:none;border-radius:10px}
-header .t{flex:1;min-width:0}header h1{font-size:16px;font-weight:800;line-height:1.15}header h1 span{color:#ffc27a}
-.sub{font-size:11px;letter-spacing:.16em;color:#d4efe2;font-weight:600;margin-top:2px}
+header{background:linear-gradient(100deg,var(--brand) 0%,var(--brand2) 60%,#228B33 100%);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:4px solid var(--sun)}
+header img{width:42px;height:42px;flex:none;border-radius:10px;background:#fff}
+header .t{flex:1;min-width:0}header h1{font-size:16px;font-weight:800;line-height:1.15}header h1 span{color:#c6ee74}
+.sub{font-size:11px;letter-spacing:.16em;color:#cfe0ff;font-weight:600;margin-top:2px}
 main{padding:16px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
 .card h3{font-size:16px;margin-bottom:8px}
@@ -29,7 +29,7 @@ main{padding:16px}
 .tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;font-weight:600;white-space:nowrap}
 .t-ok{background:var(--okbg);color:var(--ok)}.t-bad{background:var(--badbg);color:var(--bad)}.t-warn{background:var(--warnbg);color:var(--warn)}
 .btn{border:0;border-radius:10px;padding:11px 14px;font:inherit;font-weight:700;cursor:pointer;background:var(--brand);color:#fff}
-.btn.sun{background:var(--sun);color:#1b1200}.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.sun{background:var(--sun);color:#0f1f00}.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
 .btn.sm{padding:6px 10px;font-size:13px}.btn:disabled{opacity:.5;cursor:wait}
 .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.btns .btn{flex:1;min-width:110px}
 label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px}
@@ -42,11 +42,11 @@ input[type=checkbox]{width:auto;margin-right:8px}
 .nav{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;padding-bottom:2px}.nav .btn{white-space:nowrap;flex:none;padding:9px 12px;font-size:14px}
 .big{font-size:30px;font-weight:800;line-height:1.1}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--brand);color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;z-index:30;max-width:90%;box-shadow:0 4px 14px #0004}
-#splash{position:fixed;inset:0;z-index:50;background:linear-gradient(160deg,var(--brand),var(--brand2));color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;transition:opacity .5s}
+#splash{position:fixed;inset:0;z-index:50;background:linear-gradient(160deg,var(--brand),var(--brand2) 62%,#228B33);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;transition:opacity .5s}
 #splash.off{opacity:0;pointer-events:none}
-#splash svg{width:132px;height:132px;border-radius:30px;box-shadow:0 8px 30px #0005;animation:pop .8s ease-out}
-#splash h1{font-size:22px;margin-top:18px;font-weight:800}#splash h1 span{color:#ffc27a}
-#splash p{letter-spacing:.28em;font-size:12px;margin:6px 0 0;color:#d4efe2;font-weight:600}
+#splash img{width:132px;height:132px;border-radius:30px;box-shadow:0 8px 30px #0006;animation:pop .8s ease-out}
+#splash h2{margin:20px 0 0;font-size:22px;color:#fff;font-weight:800}#splash h2 span{color:#c6ee74}
+#splash p{letter-spacing:.3em;font-size:12px;margin:6px 0 0;color:#d4f3a0;font-weight:700}
 @keyframes pop{from{transform:scale(.6) rotate(-25deg);opacity:0}to{transform:none;opacity:1}}
 a{color:inherit}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
@@ -62,7 +62,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
 <script>
-const LOGO='<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="512" height="512" rx="112" fill="#007A4D"/><circle cx="256" cy="256" r="150" fill="none" stroke="#F77F00" stroke-width="46"/><path d="M256 256 L120 232 M256 256 L392 232 M256 256 V396" stroke="#fff" stroke-width="34" stroke-linecap="round" fill="none"/><circle cx="256" cy="256" r="40" fill="#fff"/></svg>';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt=n=>Math.round(+n||0).toLocaleString("fr-FR")+" FCFA";
@@ -81,7 +80,7 @@ const card=(t,b)=>`<div class="card">${t?`<h3>${t}</h3>`:""}${b}</div>`;
 const none=t=>`<p class="note" style="margin:0">${t}</p>`;
 const uid=()=>crypto.randomUUID();
 
-let sb=null,user=null,mems=[],bid=null,roles=[],P=new Set(),D={},tab=null,mode="in",busy=false;
+let sb=null,user=null,mems=[],bid=null,roles=[],P=new Set(),D={},tab=null,mode="in",busy=false,isPA=false;
 const can=p=>P.has(p),isDrv=()=>roles.includes("driver");
 const QK="tm-queue2",qget=()=>{try{return JSON.parse(localStorage.getItem(QK)||"[]")}catch(e){return[]}},qset=q=>{try{localStorage.setItem(QK,JSON.stringify(q))}catch(e){}};
 function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,3500)}
@@ -100,8 +99,8 @@ async function flush(){const q=qget();if(!q.length||!navigator.onLine||!sb)retur
  qset(left);if(left.length<q.length)toast((q.length-left.length)+" saisie(s) envoyée(s).")}
 
 async function init(){
- $("splash").innerHTML=LOGO+'<div><h1 style="margin-top:18px">EDSP – <span>ESPACE TRANSPORT</span></h1><p>TRANSPORT MANAGER</p></div>';
- $("hl").innerHTML=LOGO;
+ $("splash").innerHTML='<img src="icon-512.png" alt="EDSP"><h2>EDSP – <span>ESPACE TRANSPORT</span></h2><p>TRANSPORT MANAGER</p>';
+ $("hl").innerHTML='<img src="icon-192.png" alt="EDSP">';
  const t0=Date.now(),hide=()=>setTimeout(()=>$("splash").classList.add("off"),Math.max(0,1300-(Date.now()-t0)));
  if(!window.supabase||!window.TM_CONFIG){$("main").innerHTML=card("Connexion impossible",none("Internet est nécessaire au premier lancement."));hide();return}
  sb=supabase.createClient(TM_CONFIG.url,TM_CONFIG.key);
@@ -120,6 +119,9 @@ async function load(){
   roles=act.filter(x=>x.business_id===bid).map(x=>x.role);P=new Set();D={};
   if(bid){const p=await sb.from("role_permissions").select("permission").in("role",roles);(p.data||[]).forEach(x=>P.add(x.permission));
    if(P.size)await loadStaff();if(isDrv())await loadDrv()}
+  const pa=await sb.from("platform_admins").select("user_id").eq("user_id",user.id).maybeSingle();isPA=!!pa.data;
+  if(isPA){const q=await Promise.all([sb.from("business_accounts").select("id,name,code,verification_status,suspended,created_at").order("created_at",{ascending:false}),sb.from("business_memberships").select("business_id,role,status")]);
+   D.pb=q[0].data||[];D.pc={};(q[1].data||[]).forEach(x=>{const t=D.pc[x.business_id]=D.pc[x.business_id]||{n:0,p:0};if(x.status==="active")t.n++;else if(x.status==="pending")t.p++})}
   try{localStorage.setItem("tm-snap2",JSON.stringify({u:user.id,mems,bid,roles,P:[...P],D}))}catch(e){}
  }catch(e){try{const s=JSON.parse(localStorage.getItem("tm-snap2")||"null");if(s&&s.u===user.id){mems=s.mems;bid=s.bid;roles=s.roles;P=new Set(s.P);D=s.D}}catch(x){}toast(msg(e))}
  view();
@@ -190,13 +192,13 @@ function tabsList(){const T=[];
    if(can("ledger.read"))T.push(["cp","Comptes"]);
    if(can("maintenance.read"))T.push(["en","Entretien"]);}
   if(isDrv())T.push(["jr","Ma journée"],["mc","Mon compte"],["sg","Signaler"]);}
- T.push(["pf","Profil"]);return T}
+ if(isPA)T.push(["pa","Plateforme"]);T.push(["pf","Profil"],["ap","À propos"]);return T}
 
 function view(){
  $("out").hidden=!user;
- if(!user){$("main").innerHTML=authView();return}
+ if(!user){$("main").innerHTML=tab==="ap"?aproposView()+'<div class="btns"><button class="btn ghost" data-a="tab" data-v="in">Retour</button></div>':authView()+'<p class="note" style="text-align:center"><a href="#" data-a="tab" data-v="ap">À propos</a></p>';return}
  const T=tabsList();if(!T.some(x=>x[0]===tab))tab=T[0][0];
- const F={eq:equipe,fl:flotte,cl:clotures,cp:comptes,en:entretien,jr:journee,mc:monCompte,sg:signaler,pf:profil};
+ const F={eq:equipe,fl:flotte,cl:clotures,cp:comptes,en:entretien,pa:plateforme,ap:aproposView,jr:journee,mc:monCompte,sg:signaler,pf:profil};
  $("main").innerHTML=(T.length>1?`<div class="nav">${T.map(x=>`<button class="btn ${tab===x[0]?"":"ghost"}" data-a="tab" data-v="${x[0]}">${x[1]}</button>`).join("")}</div>`:"")+F[tab]();
 }
 
@@ -266,6 +268,14 @@ function signaler(){
  return card("Signaler une panne ou un entretien",`<label for="mk">Type</label>${sel("mk",["Vidange","Pneu","Freins","Batterie","Autre panne"].map(x=>[x,x]))}<div class="btns"><button class="btn sun" data-a="rpt">Envoyer au propriétaire</button></div>`)+
   card("Déclarer un incident",`<label for="it">Type</label>${sel("it",[["accident","Accident"],["police_check","Contrôle de police"],["theft","Vol"],["dispute","Litige"],["breakdown","Panne en route"],["other","Autre"]])}<label for="is">Gravité</label>${sel("is",[["1","Légère"],["2","Importante"],["3","Grave"]])}<label for="ix">Description</label><input id="ix"><div class="btns"><button class="btn sun" data-a="inc">Déclarer</button></div>`)}
 
+function plateforme(){const B=D.pb||[],VS={unverified:["t-warn","Non vérifiée"],pending:["t-warn","À vérifier"],verified:["t-ok","Vérifiée"],rejected:["t-bad","Rejetée"]};
+ return card("Plateforme EDSP",none("Supervision des entreprises : comptes, vérification, suspension. Les véhicules et les finances des entreprises ne sont pas affichés ici."))+B.map(b=>{const c=(D.pc||{})[b.id]||{n:0,p:0};
+  return card("",`<div class="row" style="padding-top:0"><span><b>${esc(b.name)}</b><br><span class="note" style="margin:0">${esc(b.code)} · ${c.n} membre(s) actif(s)${c.p?" · "+c.p+" demande(s)":""}</span></span><span class="col">${tag(VS[b.verification_status])}${b.suspended?tag(["t-bad","Suspendue"]):""}</span></div><div class="btns"><button class="btn sun sm" data-a="bv" data-id="${b.id}" data-v="verified">Vérifier</button><button class="btn ghost sm" data-a="bv" data-id="${b.id}" data-v="rejected">Rejeter</button><button class="btn ghost sm" data-a="bs" data-id="${b.id}" data-v="${b.suspended?"0":"1"}">${b.suspended?"Réactiver":"Suspendre"}</button></div>`)}).join("")}
+
+function aproposView(){
+ return card("",`<div style="text-align:center"><img src="logo-full.png" alt="EDEN SERVICE PLUS" style="width:min(72%,290px);border-radius:24px;box-shadow:0 6px 24px #03326e22"><p style="font-weight:800;margin:16px 0 2px">EDSP – ESPACE TRANSPORT</p><p class="note" style="margin:0;letter-spacing:.16em">TRANSPORT MANAGER</p></div>`)+
+  card("À propos",`<p style="margin:0">Application de gestion du transport pour les propriétaires, gestionnaires et chauffeurs : véhicules, journées, recettes, dépenses, clôtures et entretien.</p><p class="note">Éditée par EDEN SERVICE PLUS (EDSP), super administrateur de la plateforme.<br>Innover aujourd’hui, bâtir demain.</p><p class="note">Version de test.</p>`)}
+
 function profil(){
  const nm=(user.user_metadata||{}).full_name||"";
  let h=card(esc(nm||"Mon profil"),`<div class="note" style="margin-top:0">${esc(user.email)}</div>`);
@@ -278,7 +288,7 @@ function profil(){
 async function run(btn,fn){if(busy)return;busy=true;if(btn)btn.disabled=true;try{await fn()}catch(e){toast(msg(e))}busy=false;if(btn)btn.disabled=false}
 const ok=(r,m)=>{if(r.error)throw r.error;if(m)toast(m)};
 $("main").addEventListener("click",e=>{
- const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a,d=b.dataset,v=id=>$(id).value;
+ const b=e.target.closest("[data-a]");if(!b)return;if(b.tagName==="A")e.preventDefault();const a=b.dataset.a,d=b.dataset,v=id=>$(id).value;
  if(a==="mode"){mode=d.v;view();return}
  if(a==="tab"){tab=d.v;view();return}
  run(b,async()=>{
@@ -291,6 +301,8 @@ $("main").addEventListener("click",e=>{
    await load();return}
   if(a==="nb"){const n=v("on").trim();if(!n){toast("Renseigne le nom de ton entreprise.");return}ok(await sb.rpc("create_business",{p_name:n}),"Espace créé.");tab=null;await load();return}
   if(a==="jb"){const c=v("jc").trim();if(!c){toast("Renseigne le code du propriétaire.");return}ok(await sb.rpc("join_business",{p_code:c,p_role:v("jr")}),"Demande envoyée.");await load();return}
+  if(a==="bv"){const r=await sb.from("business_accounts").update({verification_status:d.v}).eq("id",d.id).select();if(r.error)throw r.error;if(!r.data.length)throw new Error("Action refusée.");toast("Statut mis à jour.");await load();return}
+  if(a==="bs"){if(d.v==="1"&&!confirm("Suspendre cette entreprise ? Plus personne ne pourra y accéder."))return;const r=await sb.from("business_accounts").update({suspended:d.v==="1"}).eq("id",d.id).select();if(r.error)throw r.error;if(!r.data.length)throw new Error("Action refusée.");toast(d.v==="1"?"Entreprise suspendue.":"Entreprise réactivée.");await load();return}
   if(a==="sw"){localStorage.setItem("tm-biz",d.v);tab=null;await load();return}
   if(a==="acc"){const r=await sb.from("business_memberships").update({status:d.v}).eq("id",d.id).select();if(r.error)throw r.error;if(!r.data.length)throw new Error("Action refusée.");toast(d.v==="active"?"Demande acceptée.":"Demande refusée.");await load();return}
   if(a==="accasg"){const r1=await sb.from("business_memberships").update({status:"active"}).eq("id",d.id).select();if(r1.error)throw r1.error;if(!r1.data.length)throw new Error("Action refusée.");

@@ -14,7 +14,7 @@
 *{box-sizing:border-box}html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
 h1,h2,h3{margin:0;letter-spacing:-.01em}
-.app{max-width:560px;margin:0 auto;padding-bottom:40px}
+.app{max-width:560px;margin:0 auto;padding-bottom:96px}
 header{background:linear-gradient(100deg,var(--brand) 0%,var(--brand2) 60%,#228B33 100%);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:4px solid var(--sun)}
 header img{width:42px;height:42px;flex:none;border-radius:10px;background:#fff}
 header .t{flex:1;min-width:0}header h1{font-size:16px;font-weight:800;line-height:1.15}header h1 span{color:#c6ee74}
@@ -41,13 +41,23 @@ input[type=checkbox]{width:auto;margin-right:8px}
 .seg{display:flex;gap:6px}.seg>*{flex:1}
 .nav{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;padding-bottom:2px}.nav .btn{white-space:nowrap;flex:none;padding:9px 12px;font-size:14px}
 .big{font-size:30px;font-weight:800;line-height:1.1}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--brand);color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;z-index:30;max-width:90%;box-shadow:0 4px 14px #0004}
+.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:var(--brand);color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;z-index:30;max-width:90%;box-shadow:0 4px 14px #0004}
 #splash{position:fixed;inset:0;z-index:50;background:linear-gradient(160deg,var(--brand),var(--brand2) 62%,#228B33);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;transition:opacity .5s}
 #splash.off{opacity:0;pointer-events:none}
 #splash img{width:132px;height:132px;border-radius:30px;box-shadow:0 8px 30px #0006;animation:pop .8s ease-out}
 #splash h2{margin:20px 0 0;font-size:22px;color:#fff;font-weight:800}#splash h2 span{color:#c6ee74}
 #splash p{letter-spacing:.3em;font-size:12px;margin:6px 0 0;color:#d4f3a0;font-weight:700}
 @keyframes pop{from{transform:scale(.6) rotate(-25deg);opacity:0}to{transform:none;opacity:1}}
+.bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);z-index:20;padding-bottom:env(safe-area-inset-bottom,0px)}
+.bar>div{max-width:560px;margin:0 auto;display:flex}
+.bar button{flex:1;position:relative;border:0;background:none;color:var(--mute);padding:7px 2px 6px;font:inherit;font-size:10.5px;font-weight:600;cursor:pointer;border-top:3px solid transparent;display:flex;flex-direction:column;align-items:center;gap:2px}
+.bar button.on{color:var(--ink);border-top-color:var(--sun)}
+.bar .ic{font-size:19px;line-height:1}
+.bd{position:absolute;top:2px;right:calc(50% - 26px);background:var(--bad);color:#fff;font-style:normal;font-size:10px;font-weight:700;border-radius:99px;min-width:16px;height:16px;line-height:16px;padding:0 4px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}.kpi b{display:block;font-size:19px;color:var(--ink)}.kpi span{font-size:12.5px;color:var(--mute)}
+.meter{height:6px;border-radius:3px;background:var(--line);margin-bottom:8px}.meter i{display:block;height:6px;border-radius:3px;background:var(--sun)}
+.menu{display:flex;justify-content:space-between;width:100%;border:0;border-bottom:1px dashed var(--line);background:none;color:var(--ink);font:inherit;font-size:16px;padding:14px 4px;cursor:pointer;text-align:left}.menu:last-child{border:0}
 a{color:inherit}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
 </style>
@@ -58,6 +68,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 <header><span id="hl"></span><div class="t"><h1>EDSP – <span>ESPACE TRANSPORT</span></h1><div class="sub">TRANSPORT MANAGER</div></div><button class="btn ghost sm" id="out" hidden style="color:#fff;border-color:#ffffff88">Déconnexion</button></header>
 <main id="main"></main>
 </div>
+<nav class="bar" id="bar" hidden></nav>
 <div class="toast" id="toast" hidden></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
@@ -80,7 +91,7 @@ const card=(t,b)=>`<div class="card">${t?`<h3>${t}</h3>`:""}${b}</div>`;
 const none=t=>`<p class="note" style="margin:0">${t}</p>`;
 const uid=()=>crypto.randomUUID();
 
-let sb=null,user=null,mems=[],bid=null,roles=[],P=new Set(),D={},tab=null,mode="in",busy=false,isPA=false;
+let sb=null,user=null,mems=[],bid=null,roles=[],P=new Set(),D={},tab=null,mode="in",busy=false,isPA=false,scr="home",rpP=7;
 const can=p=>P.has(p),isDrv=()=>roles.includes("driver");
 const QK="tm-queue2",qget=()=>{try{return JSON.parse(localStorage.getItem(QK)||"[]")}catch(e){return[]}},qset=q=>{try{localStorage.setItem(QK,JSON.stringify(q))}catch(e){}};
 function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,3500)}
@@ -96,6 +107,7 @@ function msg(e){const m=(e&&e.message)||String(e);
 async function flush(){const q=qget();if(!q.length||!navigator.onLine||!sb)return;let left=[];
  for(const t of ["revenues","expenses"]){const rows=q.filter(x=>x.t===t).map(x=>x.row);if(!rows.length)continue;
   const r=await sb.from(t).upsert(rows,{onConflict:"id",ignoreDuplicates:true});if(r.error)left=left.concat(q.filter(x=>x.t===t))}
+ const fu=q.filter(x=>x.fuel&&!left.includes(x)).map(x=>x.fuel);if(fu.length)await sb.from("fuel_logs").upsert(fu,{onConflict:"expense_id",ignoreDuplicates:true});
  qset(left);if(left.length<q.length)toast((q.length-left.length)+" saisie(s) envoyée(s).")}
 
 async function init(){
@@ -112,7 +124,7 @@ async function init(){
 async function load(){
  if(!user){view();return}
  try{
-  const m=await sb.from("business_memberships").select("id,business_id,role,status,business_accounts(name,code)").eq("user_id",user.id).order("created_at");
+  const m=await sb.from("business_memberships").select("id,business_id,role,status,business_accounts(name,code,verification_status)").eq("user_id",user.id).order("created_at");
   if(m.error)throw m.error;mems=m.data||[];
   const act=mems.filter(x=>x.status==="active"),sv=localStorage.getItem("tm-biz");
   bid=((act.find(x=>x.business_id===sv)||act[0])||{}).business_id||null;
@@ -128,7 +140,7 @@ async function load(){
 }
 
 async function loadStaff(){
- const q=(t,c)=>sb.from(t).select(c).eq("business_id",bid),vr=can("vehicle.read");
+ const q=(t,c)=>sb.from(t).select(c).eq("business_id",bid),vr=can("vehicle.read"),fin=can("finance.read")||can("shift.read_all"),S31d=new Date(Date.now()-30*864e5).toLocaleDateString("sv-SE"),S31=S31d+"T00:00:00";
  const r=await Promise.all([
   can("member.read")?q("business_memberships","id,user_id,role,status,profiles(full_name)"):null,
   vr?q("vehicles","id,plate,make,model,transport_type,status,line_id"):null,
@@ -139,9 +151,15 @@ async function loadStaff(){
   (can("finance.read")||can("settlement.review"))?q("settlements","shift_id,status,net,due_owner,driver_balance,return_reason,submitted_at").order("submitted_at",{ascending:false}).limit(30):null,
   can("ledger.read")?q("ledger_entries","driver_id,amount"):null,
   can("payment.record")?q("payments","id,driver_id,kind,method,amount").is("acknowledged_at",null):null,
-  can("maintenance.read")?q("maintenance_orders","id,vehicle_id,kind,status,release_decision").order("created_at",{ascending:false}).limit(20):null]);
+  can("maintenance.read")?q("maintenance_orders","id,vehicle_id,kind,status,release_decision").order("created_at",{ascending:false}).limit(20):null,
+  can("member.read")?sb.from("driver_profiles").select("user_id,licence_number,licence_category,licence_expires_on"):null,
+  fin?sb.from("revenues").select("shift_id,amount").eq("business_id",bid).gte("received_at",S31):null,
+  fin?sb.from("expenses").select("id,shift_id,vehicle_id,category,amount,status,spent_at").eq("business_id",bid).gte("spent_at",S31):null,
+  can("shift.read_all")?q("shifts","id,shift_date,vehicle_id,driver_id,start_km,end_km,ended_at").gte("shift_date",S31d).order("shift_date",{ascending:false}).limit(80):null,
+  fin?q("fuel_logs","expense_id,liters,vehicle_id").limit(40):null,
+  can("incident.read")?q("incidents","id,vehicle_id,type,severity,status,description").order("occurred_at",{ascending:false}).limit(15):null]);
  const v=i=>(r[i]&&r[i].data)||[];
- D.mem=v(0);D.veh=v(1);D.lines=v(2);D.asg=v(3);D.con=v(4);D.docs=v(5);D.set=v(6);D.led=v(7);D.pay=v(8);D.mnt=v(9);D.sh={};
+ D.mem=v(0);D.veh=v(1);D.lines=v(2);D.asg=v(3);D.con=v(4);D.docs=v(5);D.set=v(6);D.led=v(7);D.pay=v(8);D.mnt=v(9);D.dp=v(10);D.rv=v(11);D.ex=v(12);D.ms=v(13);D.fl=v(14);D.inc=v(15);D.sh={};
  if(D.set.length){const s=await sb.from("shifts").select("id,shift_date,vehicle_id,driver_id").in("id",D.set.map(x=>x.shift_id));(s.data||[]).forEach(x=>D.sh[x.id]=x)}
 }
 async function loadDrv(){
@@ -150,12 +168,13 @@ async function loadDrv(){
  const L=await Promise.all([sb.from("ledger_entries").select("amount").eq("driver_id",user.id).eq("business_id",bid),
   sb.from("payments").select("id,kind,amount,acknowledged_at").eq("driver_id",user.id).eq("business_id",bid).order("paid_at",{ascending:false}).limit(10)]);
  D.dBal=(L[0].data||[]).reduce((s,x)=>s+(+x.amount),0);D.dPay=L[1].data||[];D.my=null;
+ const lp=await sb.from("driver_profiles").select("licence_number,licence_category,licence_expires_on").eq("user_id",user.id).maybeSingle();D.dp0=lp.data;
  if(!vid)return;
  const q=await Promise.all([
   sb.from("vehicles").select("id,plate,make,model,transport_type,line_id").eq("id",vid).maybeSingle(),
   sb.from("contracts").select("mode,period,fixed_amount,percentage,rest_days_per_week,carry_over_arrears").eq("vehicle_id",vid).is("ends_on",null).limit(1),
   sb.from("documents").select("doc_type,expires_on").eq("target_type","vehicle").eq("target_id",vid),
-  sb.from("shifts").select("id").eq("vehicle_id",vid).eq("driver_id",user.id).eq("shift_date",today()).maybeSingle()]);
+  sb.from("shifts").select("id,start_km,end_km,ended_at").eq("vehicle_id",vid).eq("driver_id",user.id).eq("shift_date",today()).maybeSingle()]);
  D.my=q[0].data;D.rule=(q[1].data||[])[0]||null;D.ddocs=q[2].data||[];D.shift=q[3].data;D.line=null;D.rev=[];D.exp=[];D.st=null;
  if(D.my&&D.my.line_id){const l=await sb.from("transport_lines").select("name").eq("id",D.my.line_id).maybeSingle();D.line=l.data}
  if(D.shift){const w=await Promise.all([sb.from("revenues").select("id,amount,source").eq("shift_id",D.shift.id).order("received_at"),
@@ -183,33 +202,103 @@ function authView(){const up=mode==="up";
  <div class="btns"><button class="btn sun" data-a="${up?"signup":"signin"}">${up?"Créer mon compte":"Me connecter"}</button></div>
  <p class="note">Phase de test : connexion par e-mail. Le code SMS viendra plus tard.</p>`)}
 
+const ICON={td:"📊",vh:"🚗",cd:"👥",ms:"📍",fi:"💰",ps:"☰",jr:"🚖",mc:"💳",sg:"⚠️"};
+const GRP={en:"ps",rp:"ps",pa:"ps",pf:"ps",ap:"ps"};
+const IT={accident:"Accident",police_check:"Contrôle de police",theft:"Vol",dispute:"Litige",breakdown:"Panne en route",other:"Autre"};
+const IS={open:["t-bad","Ouvert"],handled:["t-warn","Pris en charge"],closed:["t-ok","Clôturé"]};
 function tabsList(){const T=[];
  if(bid){
-  if(P.size){const pn=(D.mem||[]).filter(x=>x.status==="pending").length;
-   T.push(["eq","Équipe"+(pn&&can("member.manage")?" ("+pn+")":"")]);
-   if(can("vehicle.read"))T.push(["fl","Flotte"]);
-   if(can("settlement.review")||can("finance.read"))T.push(["cl","Clôtures"]);
-   if(can("ledger.read"))T.push(["cp","Comptes"]);
-   if(can("maintenance.read"))T.push(["en","Entretien"]);}
+  if(P.size){T.push(["td","Tableau"]);
+   if(can("vehicle.read"))T.push(["vh","Véhicules"]);
+   if(can("member.read"))T.push(["cd","Conducteurs"]);
+   if(can("shift.read_all"))T.push(["ms","Missions"]);
+   if(can("settlement.review")||can("finance.read")||can("ledger.read"))T.push(["fi","Finances"]);}
   if(isDrv())T.push(["jr","Ma journée"],["mc","Mon compte"],["sg","Signaler"]);}
- if(isPA)T.push(["pa","Plateforme"]);T.push(["pf","Profil"],["ap","À propos"]);return T}
+ T.push(["ps","Plus"]);return T}
+const badge=t=>t==="cd"&&can("member.manage")?(D.mem||[]).filter(x=>x.status==="pending").length:t==="fi"&&can("settlement.review")?(D.set||[]).filter(x=>x.status==="submitted").length:0;
 
 function view(){
- $("out").hidden=!user;
- if(!user){$("main").innerHTML=tab==="ap"?aproposView()+'<div class="btns"><button class="btn ghost" data-a="tab" data-v="in">Retour</button></div>':authView()+'<p class="note" style="text-align:center"><a href="#" data-a="tab" data-v="ap">À propos</a></p>';return}
- const T=tabsList();if(!T.some(x=>x[0]===tab))tab=T[0][0];
- const F={eq:equipe,fl:flotte,cl:clotures,cp:comptes,en:entretien,pa:plateforme,ap:aproposView,jr:journee,mc:monCompte,sg:signaler,pf:profil};
- $("main").innerHTML=(T.length>1?`<div class="nav">${T.map(x=>`<button class="btn ${tab===x[0]?"":"ghost"}" data-a="tab" data-v="${x[0]}">${x[1]}</button>`).join("")}</div>`:"")+F[tab]();
+ $("out").hidden=!user;$("bar").hidden=!user;
+ if(!user){$("main").innerHTML=tab==="ap"?aproposView()+'<div class="btns"><button class="btn ghost" data-a="home">Retour</button></div>':scr==="auth"?authView()+'<div class="btns"><button class="btn ghost" data-a="home">Retour</button></div>':accueil();return}
+ const T=tabsList();if(!T.some(x=>x[0]===tab)&&!GRP[tab])tab=bid?T[0][0]:(isPA?"pa":"pf");
+ const cur=GRP[tab]||tab;
+ $("bar").innerHTML=`<div>${T.map(x=>{const n=badge(x[0]);return `<button class="${cur===x[0]?"on":""}" data-a="tab" data-v="${x[0]}"><span class="ic">${ICON[x[0]]}</span>${x[1]}${n?`<i class="bd">${n}</i>`:""}</button>`}).join("")}</div>`;
+ const F={td:tableau,vh:flotte,cd:conducteurs,ms:missions,fi:finances,en:carbEnt,rp:rapports,ps:plus,pa:plateforme,pf:profil,ap:aproposView,jr:journee,mc:monCompte,sg:signaler};
+ $("main").innerHTML=(GRP[tab]&&tab!=="ps"?`<div class="btns" style="margin:0 0 10px"><button class="btn ghost sm" data-a="tab" data-v="ps" style="flex:none">← Plus</button></div>`:"")+F[tab]();
 }
 
-function equipe(){
- const b=(mems.find(x=>x.business_id===bid&&x.status==="active")||{}).business_accounts||{};
- const M=D.mem||[],pend=M.filter(x=>x.status==="pending"),act=M.filter(x=>x.status==="active");
- const free=(D.veh||[]).filter(v=>!(D.asg||[]).some(a=>a.vehicle_id===v.id));
- let h=card(esc(b.name),can("member.manage")?`<div class="note" style="margin-top:0">Code à donner à ton équipe :</div><div class="code">${esc(b.code)}</div>`:none("Espace de l’entreprise."));
- h+=card("Demandes",pend.length?pend.map(r=>`<div class="row"><span><b>${esc(nameOf(r.user_id))}</b><br><span class="note" style="margin:0">${RN[r.role]}</span></span>`+(can("member.manage")?`<span class="col">${r.role==="driver"&&can("assignment.write")&&free.length?sel("fv"+r.id,free.map(v=>[v.id,v.plate]))+`<button class="btn sun sm" data-a="accasg" data-id="${r.id}" data-u="${r.user_id}">Accepter et affecter</button>`:`<button class="btn sun sm" data-a="acc" data-id="${r.id}" data-v="active">Accepter</button>`}<button class="btn ghost sm" data-a="acc" data-id="${r.id}" data-v="suspended">Refuser</button></span>`:"")+`</div>`).join(""):none("Aucune demande."));
- h+=card("Équipe",act.map(r=>`<div class="row"><span>${esc(nameOf(r.user_id))}</span>${tag(["t-ok",RN[r.role]])}</div>`).join("")||none("—"));
+function accueil(){
+ return `<div style="text-align:center;padding:10px 0 4px"><img src="icon-512.png" alt="" style="width:112px;height:112px;border-radius:26px;box-shadow:0 6px 22px #03326e33"><h2 style="margin:16px 0 4px;font-size:24px">EDSP – <span style="color:var(--brand2)">ESPACE TRANSPORT</span></h2><p class="note" style="margin:0;letter-spacing:.2em;font-weight:700">TRANSPORT MANAGER</p></div>`+
+  card("",`<p style="margin:0">Gère tes véhicules, tes chauffeurs, tes recettes et tes dépenses, avec une clôture claire chaque jour.</p><div class="btns"><button class="btn sun" data-a="go" data-v="in">Se connecter</button><button class="btn" data-a="go" data-v="up">Créer un compte</button></div>`)+
+  card("Pour qui ?",`<div class="row"><span>🏢 Propriétaires et gestionnaires de flotte</span></div><div class="row"><span>🚖 Chauffeurs : VTC, taxi, Gbaka, wôrô-wôrô</span></div><div class="row"><span>🧾 Comptables et techniciens</span></div>`)+
+  `<p class="note" style="text-align:center"><a href="#" data-a="tab" data-v="ap">À propos</a></p>`}
+
+function tableau(){
+ const t0=today(),M=D.ms||[],V=D.veh||[],drv=(D.mem||[]).filter(x=>x.role==="driver"&&x.status==="active"),ids=new Set(M.filter(s=>s.shift_date===t0).map(s=>s.id));
+ const sm=(L)=>L.filter(x=>ids.has(x.shift_id)).reduce((s,x)=>s+(+x.amount),0),rj=sm(D.rv||[]),dj=sm((D.ex||[]).filter(x=>x.status!=="rejected"));
+ const pend=(D.mem||[]).filter(x=>x.status==="pending").length,sub=(D.set||[]).filter(x=>x.status==="submitted").length;
+ const ds=(D.docs||[]).filter(d=>d.expires_on&&dl(d.expires_on)<=5),mo=(D.mnt||[]).filter(x=>x.status==="reported").length,io=(D.inc||[]).filter(x=>x.status==="open").length;
+ const lc=(D.dp||[]).filter(x=>x.licence_expires_on&&dl(x.licence_expires_on)<=5);
+ const kp=(l,v)=>`<div class="kpi"><b>${v}</b><span>${l}</span></div>`,fin=can("finance.read");
+ let h=`<div class="kpis">${kp("Véhicules",V.length)}${kp("Conducteurs actifs",drv.length)}${kp("Missions du jour",ids.size)}${kp("Recettes du jour",fin?fmt(rj):"—")}</div>`;
+ const al=[];
+ if(pend&&can("member.manage"))al.push(["👥",pend+" demande(s) d’inscription","cd"]);
+ if(sub&&can("settlement.review"))al.push(["🧾",sub+" clôture(s) à valider","fi"]);
+ ds.forEach(d=>al.push(["📄",esc((DOCT[d.doc_type]||d.doc_type)+" · "+plateOf(d.target_id))+" : "+(dl(d.expires_on)<0?"expiré":"dans "+dl(d.expires_on)+" j"),"vh"]));
+ lc.forEach(x=>al.push(["🪪","Permis de "+esc(nameOf(x.user_id))+" : "+(dl(x.licence_expires_on)<0?"expiré":"dans "+dl(x.licence_expires_on)+" j"),"cd"]));
+ if(mo)al.push(["🔧",mo+" panne(s) signalée(s)","en"]);
+ if(io)al.push(["🚨",io+" incident(s) ouvert(s)","en"]);
+ h+=card("À traiter",al.length?al.map(x=>`<div class="row"><span>${x[0]} ${x[1]}</span><button class="btn ghost sm" data-a="tab" data-v="${x[2]}">Voir</button></div>`).join(""):none("Rien à traiter pour l’instant."));
+ if(!V.length&&can("vehicle.write"))h+=card("Pour commencer",`<p style="margin:0">Ajoute ton premier véhicule, puis accepte tes chauffeurs et affecte-les.</p><div class="btns"><button class="btn sun" data-a="tab" data-v="vh">Ajouter un véhicule</button></div>`);
+ if(fin)h+=card("Aujourd’hui",`<div class="row"><span>Recettes</span><b>${fmt(rj)}</b></div><div class="row"><span>Dépenses</span><b>− ${fmt(dj)}</b></div><div class="row"><span>Résultat</span><b>${fmt(rj-dj)}</b></div>`);
  return h}
+
+function conducteurs(){
+ const M=D.mem||[],pend=M.filter(x=>x.status==="pending"),drv=M.filter(x=>x.role==="driver"&&x.status==="active"),oth=M.filter(x=>x.role!=="driver"&&x.status==="active");
+ const free=(D.veh||[]).filter(v=>!(D.asg||[]).some(a=>a.vehicle_id===v.id)),b=(mems.find(x=>x.business_id===bid&&x.status==="active")||{}).business_accounts||{};
+ let h=can("member.manage")?card("Code de l’entreprise",`<div class="note" style="margin-top:0">À donner à ton équipe pour qu’elle s’inscrive :</div><div class="code">${esc(b.code)}</div>`):"";
+ h+=card("Demandes d’inscription",pend.length?pend.map(r=>`<div class="row"><span><b>${esc(nameOf(r.user_id))}</b><br><span class="note" style="margin:0">${RN[r.role]}</span></span>`+(can("member.manage")?`<span class="col">${r.role==="driver"&&can("assignment.write")&&free.length?sel("fv"+r.id,free.map(v=>[v.id,v.plate]))+`<button class="btn sun sm" data-a="accasg" data-id="${r.id}" data-u="${r.user_id}">Accepter et affecter</button>`:`<button class="btn sun sm" data-a="acc" data-id="${r.id}" data-v="active">Accepter</button>`}<button class="btn ghost sm" data-a="acc" data-id="${r.id}" data-v="suspended">Refuser</button></span>`:"")+`</div>`).join(""):none("Aucune demande."));
+ h+=card("Conducteurs",drv.length?drv.map(r=>{const dp=(D.dp||[]).find(x=>x.user_id===r.user_id),as=(D.asg||[]).find(x=>x.driver_id===r.user_id),j=dp&&dp.licence_expires_on?dl(dp.licence_expires_on):null;
+  return `<div class="row"><span><b>${esc(nameOf(r.user_id))}</b><br><span class="note" style="margin:0">${as?"Véhicule "+esc(plateOf(as.vehicle_id)):"Sans véhicule"}${dp&&dp.licence_number?" · permis "+esc(dp.licence_number)+(dp.licence_category?" ("+esc(dp.licence_category)+")":""):" · permis non renseigné"}</span></span>${j===null?"":tag(j<0?["t-bad","Permis expiré"]:j<=5?["t-warn","Permis : "+j+" j"]:["t-ok","Permis valide"])}</div>`}).join(""):none("Aucun conducteur actif."));
+ h+=card("Autres membres",oth.map(r=>`<div class="row"><span>${esc(nameOf(r.user_id))}</span>${tag(["t-ok",RN[r.role]])}</div>`).join("")||none("—"));
+ return h}
+
+function missions(){
+ const M=D.ms||[],sg={},R={},E={};(D.set||[]).forEach(s=>sg[s.shift_id]=s);
+ (D.rv||[]).forEach(x=>R[x.shift_id]=(R[x.shift_id]||0)+(+x.amount));(D.ex||[]).filter(x=>x.status!=="rejected").forEach(x=>E[x.shift_id]=(E[x.shift_id]||0)+(+x.amount));
+ return card("Missions des 30 derniers jours",M.length?"":none("Aucune mission pour l’instant."))+M.map(s=>{const st=sg[s.id],km=s.end_km!=null&&s.start_km!=null?(s.end_km-s.start_km)+" km":"";
+  return card("",`<div class="row" style="padding-top:0"><span><b>${esc(s.shift_date)}</b> · <span class="chip">${esc(plateOf(s.vehicle_id))}</span><br><span class="note" style="margin:0">${esc(nameOf(s.driver_id))}${km?" · "+km:""}</span></span>${tag(st?CS[st.status]:s.ended_at?["t-warn","Terminée"]:["t-warn","En cours"])}</div><div class="row"><span>Recettes</span><b>${fmt(R[s.id]||0)}</b></div><div class="row"><span>Dépenses</span><b>− ${fmt(E[s.id]||0)}</b></div>`)}).join("")}
+
+function finances(){return clotures()+comptes()}
+
+function carbEnt(){
+ const FL=D.fl||[],X={};(D.ex||[]).forEach(x=>X[x.id]=x);
+ const fe=(D.ex||[]).filter(x=>(x.category==="essence"||x.category==="gasoil")&&x.status!=="rejected"),tot=fe.reduce((s,x)=>s+(+x.amount),0),lit=FL.reduce((s,x)=>s+(+x.liters),0);
+ let h=card("Carburant (30 derniers jours)",`<div class="row"><span>Dépenses de carburant</span><b>${fmt(tot)}</b></div><div class="row"><span>Litres déclarés</span><b>${lit.toLocaleString("fr-FR")} L</b></div>`+(FL.length?FL.slice(0,8).map(f=>{const e=X[f.expense_id]||{};return `<div class="row"><span>${esc(plateOf(f.vehicle_id))}<br><span class="note" style="margin:0">${esc((e.spent_at||"").slice(0,10))} · ${f.liters} L</span></span><b>${fmt(e.amount||0)}</b></div>`}).join(""):none("Aucun plein détaillé.")));
+ h+=entretien();
+ h+=card("Incidents",(D.inc||[]).length?D.inc.map(x=>`<div class="row"><span><b>${IT[x.type]||x.type}</b> · <span class="chip">${esc(plateOf(x.vehicle_id))}</span><br><span class="note" style="margin:0">${esc(x.description||"")}</span></span><span class="col">${tag(IS[x.status])}${can("incident.write")&&x.status!=="closed"?`<button class="btn ghost sm" data-a="inc2" data-id="${x.id}" data-v="${x.status==="open"?"handled":"closed"}">${x.status==="open"?"Prendre en charge":"Clôturer"}</button>`:""}</span></div>`).join(""):none("Aucun incident."));
+ return h}
+
+function rapports(){
+ const since=new Date(Date.now()-(rpP-1)*864e5).toLocaleDateString("sv-SE"),M=(D.ms||[]).filter(s=>s.shift_date>=since),ids=new Set(M.map(s=>s.id)),shv={},shd={},sdt={};
+ M.forEach(s=>{shv[s.id]=s.vehicle_id;shd[s.id]=s.driver_id;sdt[s.id]=s.shift_date});
+ const rv=(D.rv||[]).filter(x=>ids.has(x.shift_id)),ex=(D.ex||[]).filter(x=>ids.has(x.shift_id)&&x.status!=="rejected"),tot=L=>L.reduce((s,x)=>s+(+x.amount),0),R=tot(rv),X=tot(ex);
+ const grp=(L,f)=>{const o={};L.forEach(x=>{const k=f(x);o[k]=(o[k]||0)+(+x.amount)});return o};
+ const due=(D.set||[]).filter(s=>D.sh[s.shift_id]&&D.sh[s.shift_id].shift_date>=since&&s.status!=="returned").reduce((s,x)=>s+(+x.due_owner||0),0);
+ const bar=(o,srt)=>{const e=Object.entries(o).sort(srt?(a,b)=>a[0]<b[0]?-1:1:(a,b)=>b[1]-a[1]),m=Math.max(1,...e.map(x=>x[1]));return e.length?e.map(x=>`<div class="row" style="border:0;padding-bottom:2px"><span>${esc(x[0])}</span><b>${fmt(x[1])}</b></div><div class="meter"><i style="width:${Math.round(x[1]/m*100)}%"></i></div>`).join(""):none("Aucune donnée.")};
+ const b=(mems.find(x=>x.business_id===bid&&x.status==="active")||{}).business_accounts||{},vs={unverified:["t-warn","Non vérifiée"],pending:["t-warn","À vérifier"],verified:["t-ok","Vérifiée"],rejected:["t-bad","Rejetée"]}[b.verification_status]||["t-warn","—"];
+ return `<div class="seg" style="margin-bottom:12px"><button class="btn ${rpP===7?"":"ghost"}" data-a="per" data-v="7">7 jours</button><button class="btn ${rpP===30?"":"ghost"}" data-a="per" data-v="30">30 jours</button></div>`+
+  card("Bilan",`<div class="row"><span>Recettes</span><b>${fmt(R)}</b></div><div class="row"><span>Dépenses</span><b>− ${fmt(X)}</b></div><div class="row"><span>Résultat</span><b>${fmt(R-X)}</b></div><div class="row"><span>Dû au propriétaire (clôtures)</span><b>${fmt(due)}</b></div>`)+
+  card("Recettes par jour",bar(grp(rv,x=>sdt[x.shift_id]),1))+card("Dépenses par catégorie",bar(grp(ex,x=>CAT[x.category]||x.category)))+card("Recettes par véhicule",bar(grp(rv,x=>plateOf(shv[x.shift_id]))))+card("Recettes par conducteur",bar(grp(rv,x=>nameOf(shd[x.shift_id]))))+
+  (can("business.manage")?card("Paramètres de l’entreprise",`<label for="bn">Nom de l’entreprise</label><input id="bn" value="${esc(b.name)}"><div class="row" style="margin-top:8px"><span>Code</span><b class="code" style="margin:0;font-size:15px">${esc(b.code)}</b></div><div class="row"><span>Vérification EDSP</span>${tag(vs)}</div><div class="btns"><button class="btn sun" data-a="savebiz">Enregistrer</button></div><p class="note">Connexion actuelle par e-mail ; le code SMS viendra plus tard.</p>`):"")}
+
+function plus(){
+ const it=[];
+ if(P.size&&can("maintenance.read"))it.push(["🔧","Carburant et entretien","en"]);
+ if(P.size&&can("report.read"))it.push(["📈","Rapports et paramètres","rp"]);
+ if(isPA)it.push(["🛡️","Plateforme EDSP","pa"]);
+ it.push(["👤","Profil et mes espaces","pf"],["ℹ️","À propos","ap"]);
+ return card("Menu",it.map(x=>`<button class="menu" data-a="tab" data-v="${x[2]}"><span>${x[0]} ${x[1]}</span><span>›</span></button>`).join(""))}
 
 function flotte(){
  const V=D.veh||[],drv=(D.mem||[]).filter(x=>x.role==="driver"&&x.status==="active");let h="";
@@ -248,13 +337,15 @@ function journee(){
  let h=card("",`<div class="row" style="padding-top:0"><span class="chip">${esc(v.plate)}</span><span class="note" style="margin:0">${esc([v.make,v.model].filter(Boolean).join(" "))} · ${TN[v.transport_type]}${D.line?" · "+esc(D.line.name):""}</span></div><p class="note" style="margin-bottom:0">${ru?(ru.mode==="fixed"?"Versement fixe : "+fmt(ru.fixed_amount)+(ru.period==="week"?" par semaine":" par jour"):ru.mode==="percentage"?"Part du propriétaire : "+ru.percentage+" % du résultat":"Fixe "+fmt(ru.fixed_amount)+" + "+ru.percentage+" % du surplus"):"Aucun contrat défini pour ce véhicule."}</p>`);
  const al=(D.ddocs||[]).filter(d=>d.expires_on&&dl(d.expires_on)<=5);
  if((D.ddocs||[]).length)h+=`<div class="card"${al.length?' style="border-color:var(--sun)"':""}><h3>Documents du véhicule</h3>${al.length?`<p class="note" style="margin:0 0 6px;color:var(--warn)"><b>Rappel :</b> à renouveler bientôt.</p>`:""}${docRows(D.ddocs)}</div>`;
+ if(D.dp0&&D.dp0.licence_expires_on&&dl(D.dp0.licence_expires_on)<=5)h+=card("Permis de conduire",`<p class="note" style="margin:0;color:var(--warn)"><b>Rappel :</b> ton permis expire ${dl(D.dp0.licence_expires_on)<0?"(expiré)":"dans "+dl(D.dp0.licence_expires_on)+" j"}.</p>`);
  if(!D.shift)return h+card("Aujourd’hui",`<label for="sk">Kilométrage de départ (facultatif)</label><input id="sk" type="number" min="0" inputmode="numeric"><div class="btns"><button class="btn sun" data-a="start">Commencer la journée</button></div>`);
  const st=D.st?D.st.status:"draft",open=st==="draft"||st==="returned";
  const R=D.rev.concat(qs.filter(x=>x.t==="revenues").map(x=>x.row)),E=D.exp.concat(qs.filter(x=>x.t==="expenses").map(x=>x.row));
  const g=R.reduce((s,x)=>s+x.amount,0),e=E.filter(x=>x.status!=="rejected").reduce((s,x)=>s+x.amount,0),net=g-e,due=dueOf(net,ru);
  const lines=R.map(x=>`<div class="row"><span>Recette${x.source&&x.source!=="course"?" ("+esc(x.source)+")":""}${x.id&&qs.some(q=>q.row.id===x.id)?" · en attente":""}</span><b>+ ${fmt(x.amount)}</b></div>`).concat(E.map(x=>`<div class="row"><span>${esc(CAT[x.category]||x.category)}${x.note?" – "+esc(x.note):""}${x.status==="rejected"?" · rejetée":""}${qs.some(q=>q.row.id===x.id)?" · en attente":""}</span><b>− ${fmt(x.amount)}</b></div>`));
  h+=card("",`<div class="row" style="padding-top:0"><h3 style="margin:0">Aujourd’hui</h3>${tag(CS[st])}</div>${D.st&&D.st.return_reason?`<p class="note">Motif du renvoi : ${esc(D.st.return_reason)}</p>`:""}${lines.join("")||none("Aucune saisie.")}<div class="row"><span>Résultat</span><b>${fmt(net)}</b></div><div class="row"><span>Dû au propriétaire</span><b>${fmt(due)}</b></div><div class="row"><span>Reste pour toi</span><b>${fmt(net-due)}</b></div>`);
- if(open)h+=card("Nouvelle saisie",`<label for="et">Type</label><select id="et"><optgroup label="Recette"><option value="rev|course">Recette (course)</option><option value="rev|tour">Recette (tour de ligne)</option><option value="rev|autre">Autre recette</option></optgroup><optgroup label="Dépenses">${Object.keys(CAT).map(k=>`<option value="exp|${k}">${CAT[k]}</option>`).join("")}</optgroup></select><label for="ea">Montant (FCFA)</label><input id="ea" type="number" min="1" inputmode="numeric"><label for="el">Précision (facultatif)</label><input id="el"><div class="btns"><button class="btn sun" data-a="ent">Enregistrer</button><button class="btn ghost" data-a="sub">Envoyer la clôture</button></div>`);
+ if(open)h+=card("Nouvelle saisie",`<label for="et">Type</label><select id="et"><optgroup label="Recette"><option value="rev|course">Recette (course)</option><option value="rev|tour">Recette (tour de ligne)</option><option value="rev|autre">Autre recette</option></optgroup><optgroup label="Dépenses">${Object.keys(CAT).map(k=>`<option value="exp|${k}">${CAT[k]}</option>`).join("")}</optgroup></select><label for="ea">Montant (FCFA)</label><input id="ea" type="number" min="1" inputmode="numeric"><label for="el">Précision (facultatif)</label><input id="el"><label for="eq">Litres (si carburant, facultatif)</label><input id="eq" type="number" min="0" step="0.1" inputmode="decimal"><div class="btns"><button class="btn sun" data-a="ent">Enregistrer</button><button class="btn ghost" data-a="sub">Envoyer la clôture</button></div>`);
+ if(open&&!D.shift.ended_at)h+=card("Fin de mission",`<label for="ek">Kilométrage d’arrivée (facultatif)</label><input id="ek" type="number" min="0" inputmode="numeric"><div class="btns"><button class="btn ghost" data-a="endsh">Terminer la mission</button></div>`);
  return h}
 
 function monCompte(){
@@ -279,6 +370,7 @@ function aproposView(){
 function profil(){
  const nm=(user.user_metadata||{}).full_name||"";
  let h=card(esc(nm||"Mon profil"),`<div class="note" style="margin-top:0">${esc(user.email)}</div>`);
+ if(isDrv()){const dp=D.dp0||{};h+=card("Mon permis de conduire",`<label for="pn">Numéro de permis</label><input id="pn" value="${esc(dp.licence_number||"")}"><label for="pc">Catégorie</label><input id="pc" value="${esc(dp.licence_category||"")}" placeholder="Ex. B"><label for="px">Date d’expiration</label><input id="px" type="date" value="${esc(dp.licence_expires_on||"")}"><div class="btns"><button class="btn sun" data-a="savelic">Enregistrer</button></div>`)}
  if(mems.length)h+=card("Mes espaces",mems.map(m=>`<div class="row"><span><b>${esc((m.business_accounts||{}).name||"")}</b><br><span class="note" style="margin:0">${RN[m.role]}</span></span><span class="col">${tag(m.status==="active"?["t-ok","Actif"]:m.status==="pending"?["t-warn","En attente"]:["t-bad","Refusé"])}${m.status==="active"&&m.business_id!==bid?`<button class="btn ghost sm" data-a="sw" data-v="${m.business_id}">Ouvrir</button>`:""}</span></div>`).join(""));
  if(!mems.some(m=>m.role==="owner"))h+=card("Je suis propriétaire",`<label for="on">Nom de ton entreprise ou activité</label><input id="on" placeholder="Ex. Transports Kouassi"><div class="btns"><button class="btn sun" data-a="nb">Créer mon espace</button></div>`);
  h+=card("Je rejoins un propriétaire",`<label for="jc">Code du propriétaire</label><input id="jc" placeholder="PROP-XXXXXX" autocapitalize="characters"><label for="jr">Mon rôle</label>${sel("jr",[["driver","Chauffeur"],["fleet_manager","Gestionnaire de flotte"],["accountant","Comptable"],["technician","Technicien"]])}<div class="btns"><button class="btn sun" data-a="jb">Envoyer ma demande</button></div>`);
@@ -287,10 +379,13 @@ function profil(){
 /* ---------- actions ---------- */
 async function run(btn,fn){if(busy)return;busy=true;if(btn)btn.disabled=true;try{await fn()}catch(e){toast(msg(e))}busy=false;if(btn)btn.disabled=false}
 const ok=(r,m)=>{if(r.error)throw r.error;if(m)toast(m)};
-$("main").addEventListener("click",e=>{
+document.addEventListener("click",e=>{
  const b=e.target.closest("[data-a]");if(!b)return;if(b.tagName==="A")e.preventDefault();const a=b.dataset.a,d=b.dataset,v=id=>$(id).value;
  if(a==="mode"){mode=d.v;view();return}
  if(a==="tab"){tab=d.v;view();return}
+ if(a==="go"){mode=d.v;scr="auth";view();return}
+ if(a==="home"){scr="home";tab=null;view();return}
+ if(a==="per"){rpP=+d.v;view();return}
  run(b,async()=>{
   if(a==="signin"||a==="signup"){
    const em=v("em").trim(),pw=v("pw");if(!em||!pw){toast("Renseigne l’e-mail et le mot de passe.");return}
@@ -301,6 +396,10 @@ $("main").addEventListener("click",e=>{
    await load();return}
   if(a==="nb"){const n=v("on").trim();if(!n){toast("Renseigne le nom de ton entreprise.");return}ok(await sb.rpc("create_business",{p_name:n}),"Espace créé.");tab=null;await load();return}
   if(a==="jb"){const c=v("jc").trim();if(!c){toast("Renseigne le code du propriétaire.");return}ok(await sb.rpc("join_business",{p_code:c,p_role:v("jr")}),"Demande envoyée.");await load();return}
+  if(a==="endsh"){const k=v("ek");ok(await sb.from("shifts").update({ended_at:new Date().toISOString(),end_km:k?+k:null}).eq("id",D.shift.id),"Mission terminée.");await load();return}
+  if(a==="savelic"){ok(await sb.from("driver_profiles").upsert({user_id:user.id,licence_number:v("pn").trim()||null,licence_category:v("pc").trim()||null,licence_expires_on:v("px")||null,updated_at:new Date().toISOString()}),"Permis enregistré.");await load();return}
+  if(a==="savebiz"){const n=v("bn").trim();if(!n){toast("Renseigne le nom.");return}const r=await sb.from("business_accounts").update({name:n}).eq("id",bid).select();if(r.error)throw r.error;if(!r.data.length)throw new Error("Action refusée.");toast("Enregistré.");await load();return}
+  if(a==="inc2"){ok(await sb.from("incidents").update({status:d.v}).eq("id",d.id));await load();return}
   if(a==="bv"){const r=await sb.from("business_accounts").update({verification_status:d.v}).eq("id",d.id).select();if(r.error)throw r.error;if(!r.data.length)throw new Error("Action refusée.");toast("Statut mis à jour.");await load();return}
   if(a==="bs"){if(d.v==="1"&&!confirm("Suspendre cette entreprise ? Plus personne ne pourra y accéder."))return;const r=await sb.from("business_accounts").update({suspended:d.v==="1"}).eq("id",d.id).select();if(r.error)throw r.error;if(!r.data.length)throw new Error("Action refusée.");toast(d.v==="1"?"Entreprise suspendue.":"Entreprise réactivée.");await load();return}
   if(a==="sw"){localStorage.setItem("tm-biz",d.v);tab=null;await load();return}
@@ -331,7 +430,9 @@ $("main").addEventListener("click",e=>{
   if(a==="start"){const k=v("sk");ok(await sb.from("shifts").insert({business_id:bid,vehicle_id:D.my.id,driver_id:user.id,shift_date:today(),started_at:new Date().toISOString(),start_km:k?+k:null}));await load();return}
   if(a==="ent"){const p=v("et").split("|"),am=Math.round(+v("ea"));if(!(am>0)){toast("Montant invalide.");return}const note=v("el").trim()||null;
    const it=p[0]==="rev"?{t:"revenues",row:{id:uid(),business_id:bid,shift_id:D.shift.id,amount:am,source:p[1]}}:{t:"expenses",row:{id:uid(),business_id:bid,shift_id:D.shift.id,vehicle_id:D.my.id,category:p[1],amount:am,note:note,created_by:user.id}};
+   const lt=+v("eq");if(it.t==="expenses"&&lt>0&&(p[1]==="essence"||p[1]==="gasoil"))it.fuel={business_id:bid,expense_id:it.row.id,vehicle_id:D.my.id,liters:lt,price_per_liter:Math.round(am/lt*100)/100};
    let good=navigator.onLine;if(good){const r=await sb.from(it.t).insert(it.row);if(r.error){if(/fetch|network/i.test(r.error.message))good=false;else throw r.error}}
+   if(good&&it.fuel)await sb.from("fuel_logs").insert(it.fuel);
    if(!good){qset(qget().concat(it));toast("Pas de réseau : saisie gardée sur le téléphone.");view();return}
    toast("Saisie enregistrée.");await load();return}
   if(a==="sub"){if(!confirm("Envoyer la clôture ? Tu ne pourras plus modifier la journée."))return;
@@ -343,7 +444,7 @@ $("main").addEventListener("click",e=>{
   if(a==="inc"){ok(await sb.from("incidents").insert({business_id:bid,vehicle_id:D.my.id,type:v("it"),severity:+v("is"),description:v("ix").trim()||null,reported_by:user.id}),"Incident déclaré.");return}
  });
 });
-$("out").onclick=()=>run($("out"),async()=>{await sb.auth.signOut();user=null;mems=[];bid=null;D={};view()});
+$("out").onclick=()=>run($("out"),async()=>{await sb.auth.signOut();user=null;mems=[];bid=null;D={};scr="home";tab=null;view()});
 
 addEventListener("offline",()=>toast("Hors connexion : tes saisies seront gardées sur le téléphone."));
 addEventListener("online",()=>flush().then(load));

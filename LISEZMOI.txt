@@ -7,3 +7,7 @@ POUR METTRE A JOUR (3 gestes)
 
 Le fichier demo.html de l'ancienne version peut rester, il n'est plus utilisé.
 config.js ne contient que la clé PUBLIQUE. Ne jamais y mettre la clé "service_role" ou "secret".
+
+MOT DE PASSE OUBLIE : dans Supabase > Authentication > URL Configuration, mets dans "Site URL" l'adresse de l'application
+(https://egnongrace445-bot.github.io/espace-transport/) et ajoute-la aussi dans "Redirect URLs".
+CONNEXION PAR SMS : désactivée. Elle s'active dans config.js (sms:true) une fois un fournisseur SMS configuré dans Supabase.

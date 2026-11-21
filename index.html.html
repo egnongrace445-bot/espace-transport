@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://dfsuaykafvtmmvdfluzt.supabase.co; connect-src 'self' https://dfsuaykafvtmmvdfluzt.supabase.co wss://dfsuaykafvtmmvdfluzt.supabase.co; font-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#03326E">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>EDSP – ESPACE TRANSPORT</title>
+<style>
+:root{--bg:#f1f4f1;--card:#fff;--ink:#1b2a24;--mute:#5a6b63;--line:#d8e0da;--brand:#03326E;--brand2:#01478D;--sun:#97D010;--okbg:#dcf3e8;--badbg:#fbe1dc;--warnbg:#fdecd0;--ok:#0b7a4b;--bad:#b8352a;--warn:#a85f00;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1713;--card:#18231e;--ink:#e9f0ec;--mute:#9db0a6;--line:#2a3a32;--brand:#021f45;--brand2:#033a75;--okbg:#14382a;--badbg:#42221e;--warnbg:#41300f;--ok:#55c595;--bad:#ef8b7f;--warn:#f0b955}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+h1,h2,h3{margin:0;letter-spacing:-.01em}
+.app{max-width:560px;margin:0 auto;padding-bottom:96px}
+header{background:linear-gradient(100deg,var(--brand) 0%,var(--brand2) 60%,#228B33 100%);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:4px solid var(--sun)}
+header img{width:42px;height:42px;flex:none;border-radius:10px;background:#fff}
+header .t{flex:1;min-width:0}header h1{font-size:16px;font-weight:800;line-height:1.15}header h1 span{color:#c6ee74}
+.sub{font-size:11px;letter-spacing:.16em;color:#cfe0ff;font-weight:600;margin-top:2px}
+main{padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.card h3{font-size:16px;margin-bottom:8px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line)}
+.row:last-child{border:0}
+.col{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.neg{color:var(--bad)}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;font-weight:600;white-space:nowrap}
+.t-ok{background:var(--okbg);color:var(--ok)}.t-bad{background:var(--badbg);color:var(--bad)}.t-warn{background:var(--warnbg);color:var(--warn)}
+.btn{border:0;border-radius:10px;padding:11px 14px;font:inherit;font-weight:700;cursor:pointer;background:var(--brand);color:#fff}
+.btn.sun{background:var(--sun);color:#0f1f00}.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.sm{padding:6px 10px;font-size:13px}.btn:disabled{opacity:.5;cursor:wait}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.btns .btn{flex:1;min-width:110px}
+label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px}
+input,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+input[type=checkbox]{width:auto;margin-right:8px}
+.note{font-size:12.5px;color:var(--mute);margin-top:8px}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:20px;font-weight:700;letter-spacing:.06em;background:var(--bg);border:1px dashed var(--sun);border-radius:10px;padding:8px 12px;display:inline-block;margin:6px 0}
+.chip{font-family:ui-monospace,Menlo,monospace;font-weight:700;border:2px solid var(--ink);border-radius:6px;padding:1px 7px;font-size:13px;white-space:nowrap}
+.seg{display:flex;gap:6px}.seg>*{flex:1}
+.nav{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;padding-bottom:2px}.nav .btn{white-space:nowrap;flex:none;padding:9px 12px;font-size:14px}
+.big{font-size:30px;font-weight:800;line-height:1.1}
+.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:var(--brand);color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;z-index:30;max-width:90%;box-shadow:0 4px 14px #0004}
+#splash{position:fixed;inset:0;z-index:50;background:linear-gradient(160deg,var(--brand),var(--brand2) 62%,#228B33);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;transition:opacity .5s}
+#splash.off{opacity:0;pointer-events:none}
+#splash img{width:132px;height:132px;border-radius:30px;box-shadow:0 8px 30px #0006;animation:pop .8s ease-out}
+#splash h2{margin:20px 0 0;font-size:22px;color:#fff;font-weight:800}#splash h2 span{color:#c6ee74}
+#splash p{letter-spacing:.3em;font-size:12px;margin:6px 0 0;color:#d4f3a0;font-weight:700}
+@keyframes pop{from{transform:scale(.6) rotate(-25deg);opacity:0}to{transform:none;opacity:1}}
+.bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);z-index:20;padding-bottom:env(safe-area-inset-bottom,0px)}
+.bar>div{max-width:560px;margin:0 auto;display:flex}
+.bar button{flex:1;position:relative;border:0;background:none;color:var(--mute);padding:7px 2px 6px;font:inherit;font-size:10.5px;font-weight:600;cursor:pointer;border-top:3px solid transparent;display:flex;flex-direction:column;align-items:center;gap:2px}
+.bar button.on{color:var(--ink);border-top-color:var(--sun)}
+.bar .ic{font-size:19px;line-height:1}
+.bd{position:absolute;top:2px;right:calc(50% - 26px);background:var(--bad);color:#fff;font-style:normal;font-size:10px;font-weight:700;border-radius:99px;min-width:16px;height:16px;line-height:16px;padding:0 4px}
+.bd2{position:absolute;top:-6px;right:-6px;background:#e0382b;color:#fff;font-style:normal;font-size:10px;font-weight:700;border-radius:99px;min-width:16px;height:16px;line-height:16px;padding:0 4px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}.kpi b{display:block;font-size:19px;color:var(--ink)}.kpi span{font-size:12.5px;color:var(--mute)}
+.meter{height:6px;border-radius:3px;background:var(--line);margin-bottom:8px}.meter i{display:block;height:6px;border-radius:3px;background:var(--sun)}
+.card.tight{padding:2px 14px}
+.acc>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 0;font-weight:600}
+.acc>summary::-webkit-details-marker{display:none}
+.acc>summary .at{flex:1;min-width:0}
+.acc>summary .sm2{font-weight:400;color:var(--mute);font-size:13px;text-align:right;max-width:55%}
+.acc>summary::after{content:"›";color:var(--mute);font-size:22px;line-height:1;transition:transform .15s;flex:none}
+.acc[open]>summary::after{transform:rotate(90deg)}
+.acc+.acc{border-top:1px solid var(--line)}
+.acc-b{padding:0 0 12px}
+.sec{margin:16px 4px 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);font-weight:700}
+.btn.lnk{border:0;background:none;color:var(--bad);text-decoration:underline;padding:6px 4px;font-weight:600}
+.menu{display:flex;justify-content:space-between;width:100%;border:0;border-bottom:1px dashed var(--line);background:none;color:var(--ink);font:inherit;font-size:16px;padding:14px 4px;cursor:pointer;text-align:left}.menu:last-child{border:0}
+a{color:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+</style>
+</head>
+<body>
+<div id="splash"></div>
+<div class="app">
+<header><span id="hl"></span><div class="t"><h1>EDSP – <span>ESPACE TRANSPORT</span></h1><div class="sub">TRANSPORT MANAGER</div></div><button class="btn ghost sm" id="bell" hidden data-a="tab" data-v="nt" style="color:#fff;border-color:#ffffff88;position:relative">🔔</button><button class="btn ghost sm" id="out" hidden style="color:#fff;border-color:#ffffff88">Déconnexion</button></header>
+<main id="main"></main>
+</div>
+<nav class="bar" id="bar" hidden></nav>
+<div class="toast" id="toast" hidden></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

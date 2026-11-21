@@ -1,4 +1,4 @@
-const C="edsp-v13";
+const C="edsp-v19";
 const CDN="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js";
 const FILES=["./","index.html","app.js","config.js","manifest.webmanifest","icon-192.png","icon-512.png","logo-full.png",CDN];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(C).then(c=>Promise.all(FILES.map(f=>c.add(f).catch(()=>{})))));self.skipWaiting()});

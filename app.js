@@ -35,7 +35,7 @@ async function upload(f,tt,tid,dt,extra){const b=await shrink(f),ext=b.type==="a
  const r=await sb.from("documents").insert(Object.assign({business_id:bid,target_type:tt,target_id:tid,doc_type:dt,file_path:path,uploaded_by:user.id},extra||{}));if(r.error)throw r.error;return path}
 async function openFile(path){const s=await sb.storage.from("justificatifs").createSignedUrl(path,600);if(s.error)throw s.error;window.open(s.data.signedUrl,"_blank","noopener,noreferrer")}
 
-let sb=null,user=null,mems=[],bid=null,roles=[],P=new Set(),D={},tab=null,mode="in",busy=false,isPA=false,scr="home",rpP=7,recov=false,mfaStep=null,mfaEnr=null,phStep=0,phNum="",lastUn=-1,selDate=null,selDrv=null;
+let sb=null,user=null,mems=[],bid=null,roles=[],P=new Set(),D={},tab=null,mode="in",busy=false,isPA=false,scr="home",rpP=7,recov=false,mfaStep=null,mfaEnr=null,phStep=0,phNum="",lastUn=-1,selDate=null,selDrv=null,suSp=new Set(),suGo=false,MYSP=[],signupTried=false,SOL=[],DRL=[],MYL=null,selSol=null,MYR="";
 const can=p=>P.has(p),isDrv=()=>roles.includes("driver");
 const QK="tm-queue2",qraw=()=>{try{return JSON.parse(localStorage.getItem(QK)||"[]")}catch(e){return[]}};
 /* file d'attente hors connexion : chaque saisie est rattachée à son auteur, un autre compte sur le même téléphone ne la voit ni ne l'envoie */
@@ -65,7 +65,7 @@ async function init(){
  const t0=Date.now(),hide=()=>setTimeout(()=>$("splash").classList.add("off"),Math.max(0,1300-(Date.now()-t0)));
  if(!window.supabase||!window.TM_CONFIG){$("main").innerHTML=card("Connexion impossible",none("Internet est nécessaire au premier lancement."));hide();return}
  sb=supabase.createClient(TM_CONFIG.url,TM_CONFIG.key);
- sb.auth.onAuthStateChange(ev=>{if(ev==="SIGNED_OUT"){user=null;mems=[];bid=null;D={};setTimeout(view,0)}if(ev==="PASSWORD_RECOVERY"){recov=true;setTimeout(view,0)}});
+ sb.auth.onAuthStateChange(ev=>{if(ev==="SIGNED_OUT"){signupTried=false;user=null;mems=[];bid=null;D={};setTimeout(view,0)}if(ev==="PASSWORD_RECOVERY"){recov=true;setTimeout(view,0)}});
  const r=await sb.auth.getSession();user=r.data.session?r.data.session.user:null;
  if(user&&await mfaCheck()){hide();return}
  await flush();await load();hide();
@@ -76,6 +76,11 @@ async function load(){
  try{
   const m=await sb.from("business_memberships").select("id,business_id,role,status,business_accounts(name,code,verification_status,expense_auto_approve_limit,legal_form,registration_no)").eq("user_id",user.id).order("created_at");
   if(m.error)throw m.error;mems=m.data||[];
+  {const md=user.user_metadata||{},sp=md.signup_spaces||(md.signup_role?[md.signup_role]:null);if(Array.isArray(sp)&&sp.length&&!signupTried){signupTried=true;
+   try{const want=sp.filter(x=>x==="user"||x==="driver");if(want.length){const r0=await sb.from("profiles").update({spaces:want}).eq("id",user.id);if(r0.error)throw r0.error}
+    if(sp.includes("owner")&&md.signup_biz&&!mems.some(x=>x.role==="owner")){const r=await sb.rpc("create_business",{p_name:md.signup_biz});if(r.error)throw r.error;toast("Espace propriétaire créé.")}}catch(e){toast(msg(e))}
+   try{await sb.auth.updateUser({data:{signup_spaces:null,signup_role:null,signup_biz:null}})}catch(x){}
+   const m2=await sb.from("business_memberships").select("id,business_id,role,status,business_accounts(name,code,verification_status,expense_auto_approve_limit,legal_form,registration_no)").eq("user_id",user.id).order("created_at");if(!m2.error)mems=m2.data||[]}}
   const act=mems.filter(x=>x.status==="active"),sv=localStorage.getItem("tm-biz");
   bid=((act.find(x=>x.business_id===sv)||act[0])||{}).business_id||null;
   roles=act.filter(x=>x.business_id===bid).map(x=>x.role);P=new Set();D={};
@@ -85,16 +90,23 @@ async function load(){
   if(isPA){const q=await Promise.all([sb.from("business_accounts").select("id,name,code,verification_status,suspended,created_at").order("created_at",{ascending:false}),sb.from("business_memberships").select("business_id,role,status")]);
    D.pb=q[0].data||[];D.pc={};(q[1].data||[]).forEach(x=>{const t=D.pc[x.business_id]=D.pc[x.business_id]||{n:0,p:0};if(x.status==="active")t.n++;else if(x.status==="pending")t.p++})}
   const nn=await sb.from("notifications").select("id,kind,title,body,created_at,read_at").order("created_at",{ascending:false}).limit(30);D.nt=nn.data||[];try{const mf=await sb.auth.mfa.listFactors();D.mf=(mf.data&&mf.data.totp)||[]}catch(e){D.mf=[]}
-  const un=D.nt.filter(x=>!x.read_at).length;if(un>lastUn&&lastUn>=0&&"Notification" in window&&Notification.permission==="granted")try{new Notification("EDSP – ESPACE TRANSPORT",{body:D.nt.find(x=>!x.read_at).title,icon:"icon-192.png"})}catch(e){}lastUn=un;
+  const un=D.nt.filter(x=>!x.read_at).length;if(un>lastUn&&lastUn>=0&&"Notification" in window&&Notification.permission==="granted")try{new Notification("EDSP – ESPACE TRANSPORT",{body:D.nt.find(x=>!x.read_at).title,icon:"icon-192.png"})}catch(e){}lastUn=un;await loadSol();
   try{localStorage.setItem("tm-snap2",JSON.stringify({u:user.id,mems,bid,roles,P:[...P],D}))}catch(e){}
  }catch(e){try{const s=JSON.parse(localStorage.getItem("tm-snap2")||"null");if(s&&s.u===user.id){mems=s.mems;bid=s.bid;roles=s.roles;P=new Set(s.P);D=s.D}}catch(x){}toast(msg(e))}
  view();
 }
 
+async function loadSol(){try{const q=await Promise.all([sb.rpc("my_solicitations"),sb.rpc("list_visible_drivers"),sb.from("driver_listings").select("*").eq("user_id",user.id).maybeSingle(),sb.from("profiles").select("residence,spaces").eq("id",user.id).maybeSingle()]);SOL=q[0].data||[];DRL=q[1].data||[];MYL=q[2].data||null;MYR=(q[3].data&&q[3].data.residence)||"";MYSP=(q[3].data&&q[3].data.spaces)||[]}catch(e){}}
+const acct=()=>((user&&user.user_metadata)||{}).account_type||"";
+const SPN={user:"Usager",driver:"Chauffeur",owner:"Propriétaire"};
+const spaceOn=k=>k==="owner"?mems.some(m=>m.role==="owner"&&m.status==="active"):k==="driver"?(MYSP.includes("driver")||acct()==="driver"||mems.some(m=>m.role==="driver"&&m.status==="active")):(MYSP.includes("user")||acct()==="user");
+const pendIn=()=>(SOL||[]).filter(x=>x.direction==="in"&&x.status==="pending").length;
+const KL={personal:"Course personnelle",replacement:"Remplacement de chauffeur",join:"Rejoindre une entreprise",other:"Autre"};
+const SST={pending:["t-warn","En attente"],accepted:["t-ok","Acceptée"],declined:["t-bad","Refusée"],cancelled:["t-warn","Annulée"]};
 async function loadStaff(){
  const q=(t,c)=>sb.from(t).select(c).eq("business_id",bid),vr=can("vehicle.read"),fin=can("finance.read")||can("shift.read_all"),S31d=new Date(Date.now()-30*864e5).toLocaleDateString("sv-SE"),S31=S31d+"T00:00:00";
  const r=await Promise.all([
-  can("member.read")?q("business_memberships","id,user_id,role,status,profiles(full_name)"):null,
+  can("member.read")?q("business_memberships","id,user_id,role,status,profiles(full_name,residence)"):null,
   vr?q("vehicles","id,plate,make,model,transport_type,status,line_id"):null,
   vr?q("transport_lines","id,name,transport_type"):null,
   vr?q("vehicle_assignments","id,vehicle_id,driver_id").is("ends_on",null):null,
@@ -152,6 +164,7 @@ function dueOf(net,r){if(!r)return 0;
 const conTxt=c=>(c.mode==="fixed"?fmt(c.fixed_amount):c.mode==="percentage"?c.percentage+" %":fmt(c.fixed_amount)+" + "+c.percentage+" %")+(c.period==="week"?" / semaine":"");
 const docRows=l=>l.map(d=>{const j=d.expires_on?dl(d.expires_on):null,t=j===null?["t-warn","Sans date"]:j<0?["t-bad","Expiré"]:j<=5?["t-warn","Dans "+j+" j"]:["t-ok","Valide"];
  return `<div class="row"><span>${DOCT[d.doc_type]||esc(d.doc_type)}<br><span class="note" style="margin:0">${d.expires_on?"échéance "+d.expires_on.split("-").reverse().join("/"):""}</span></span>${tag(t)}${d.file_path&&can("document.read")?`<button class="btn ghost sm" data-a="seefile" data-f="${esc(d.file_path)}">📎</button>`:""}</div>`}).join("");
+const residOf=u=>{const m=(D.mem||[]).find(x=>x.user_id===u);return(m&&m.profiles&&m.profiles.residence)||""};
 const nameOf=u=>{const m=(D.mem||[]).find(x=>x.user_id===u);return(m&&m.profiles&&m.profiles.full_name)||"Membre"};
 const plateOf=id=>{const v=(D.veh||[]).find(x=>x.id===id);return v?v.plate:""};
 
@@ -159,18 +172,20 @@ const plateOf=id=>{const v=(D.veh||[]).find(x=>x.id===id);return v?v.plate:""};
 const authTabs=()=>`<div class="seg"><button class="btn ${mode==="in"?"":"ghost"}" data-a="mode" data-v="in">Se connecter</button><button class="btn ${mode==="up"?"":"ghost"}" data-a="mode" data-v="up">Créer un compte</button>${SMS?`<button class="btn ${mode==="ph"?"":"ghost"}" data-a="mode" data-v="ph">Téléphone</button>`:""}</div>`;
 function phoneView(){return card("",authTabs()+(phStep?`<label for="pt">Code reçu par SMS</label><input id="pt" inputmode="numeric" autocomplete="one-time-code"><div class="btns"><button class="btn sun" data-a="phverify">Valider</button></div>`:`<label for="fn">Nom complet (nouveau compte)</label><input id="fn"><label for="ph">Téléphone (+225…)</label><input id="ph" type="tel" inputmode="tel" placeholder="+225 07 00 00 00 00"><div class="btns"><button class="btn sun" data-a="phsend">Recevoir le code</button></div>`))}
 function authView(){if(mode==="ph"&&SMS)return phoneView();const up=mode==="up";
+ if(up&&!suGo)return card("",authTabs()+`<h3 style="margin:14px 0 4px">Quels espaces veux-tu activer ?</h3><p class="note" style="margin:0 0 8px">Un seul compte, plusieurs espaces. Tu peux en choisir plusieurs et changer plus tard.</p>`+[["user","🙋 Usager","Je cherche un chauffeur"],["driver","🚖 Chauffeur","Je conduis et je peux être sollicité"],["owner","🏢 Propriétaire","J’ai des véhicules à gérer"]].map(x=>`<button class="menu" data-a="spt" data-v="${x[0]}"><span>${suSp.has(x[0])?"✅":"⬜"} ${x[1]}<br><span class="note" style="margin:0">${x[2]}</span></span></button>`).join("")+`<div class="btns"><button class="btn sun" data-a="spgo">Continuer</button></div>`);
  return card("",`${authTabs()}
- ${up?'<label for="fn">Nom complet</label><input id="fn" autocomplete="name">':""}
+ ${up?`<div class="row" style="padding-top:0"><span>Espaces : <b>${[...suSp].map(k=>SPN[k]).join(", ")}</b></span><button class="btn ghost sm" data-a="spback">Changer</button></div><label for="fn">Nom complet</label><input id="fn" autocomplete="name">${suSp.has("owner")?'<label for="sb">Nom de ton entreprise ou activité</label><input id="sb" placeholder="Ex. Transports Kouassi">':""}`:""}
  <label for="em">Adresse e-mail</label><input id="em" type="email" autocomplete="email" inputmode="email">
  <label for="pw">Mot de passe</label><input id="pw" type="password" autocomplete="${up?"new-password":"current-password"}" placeholder="8 caractères minimum">
  <div class="btns"><button class="btn sun" data-a="${up?"signup":"signin"}">${up?"Créer mon compte":"Me connecter"}</button></div>${up?"":'<p class="note" style="text-align:center"><a href="#" data-a="forgot">Mot de passe oublié ?</a></p>'}
  <p class="note">Phase de test : connexion par e-mail. Le code SMS viendra plus tard.</p>`)}
 
-const ICON={td:"📊",vh:"🚗",cd:"👥",ms:"📍",fi:"💰",ps:"☰",jr:"🚖",mc:"💳",sg:"⚠️"};
+const ICON={sl:"🔎",sq:"🤝",td:"📊",vh:"🚗",cd:"👥",ms:"📍",fi:"💰",ps:"☰",jr:"🚖",mc:"💳",sg:"⚠️"};
 const GRP={en:"ps",rp:"ps",pa:"ps",pf:"ps",ap:"ps",nt:"ps",au:"ps"};
 const VST={in_service:["t-ok","En service"],available:["t-ok","Disponible"],maintenance:["t-warn","En maintenance"],immobilised:["t-bad","Immobilisé"]};
 const IT={accident:"Accident",police_check:"Contrôle de police",theft:"Vol",dispute:"Litige",breakdown:"Panne en route",other:"Autre"};
 const IS={open:["t-bad","Ouvert"],handled:["t-warn","Pris en charge"],closed:["t-ok","Clôturé"]};
+const G=t=>(t==="sl"||t==="sq")?(bid?"ps":null):GRP[t];
 function tabsList(){const T=[];
  if(bid){
   if(P.size){T.push(["td","Tableau"]);
@@ -179,20 +194,21 @@ function tabsList(){const T=[];
    if(can("shift.read_all"))T.push(["ms","Missions"]);
    if(can("settlement.review")||can("finance.read")||can("ledger.read"))T.push(["fi","Finances"]);}
   if(isDrv())T.push(["jr","Ma journée"],["mc","Mon compte"],["sg","Signaler"]);}
+ if(!bid){if(spaceOn("user"))T.push(["sl","Chauffeurs"]);if(spaceOn("user")||spaceOn("driver"))T.push(["sq","Demandes"])}
  T.push(["ps","Plus"]);return T}
 const unr=()=>(D.nt||[]).filter(x=>!x.read_at).length;
-const badge=t=>t==="cd"&&can("member.manage")?(D.mem||[]).filter(x=>x.status==="pending").length:t==="fi"?((can("settlement.review")?(D.set||[]).filter(x=>x.status==="submitted").length:0)+(can("expense.approve")?(D.ex||[]).filter(x=>x.status==="pending").length:0)):t==="ps"?unr():0;
+const badge=t=>t==="sq"?pendIn():t==="cd"&&can("member.manage")?(D.mem||[]).filter(x=>x.status==="pending").length:t==="fi"?((can("settlement.review")?(D.set||[]).filter(x=>x.status==="submitted").length:0)+(can("expense.approve")?(D.ex||[]).filter(x=>x.status==="pending").length:0)):t==="ps"?unr():0;
 
 function view(){
  $("out").hidden=!user;$("bar").hidden=!user;$("bell").hidden=!user;{const u=unr();$("bell").innerHTML="🔔"+(u?`<i class="bd2">${u}</i>`:"")}
  if(recov){$("main").innerHTML=card("Nouveau mot de passe",`<label for="np">Nouveau mot de passe</label><input id="np" type="password" autocomplete="new-password" placeholder="8 caractères minimum"><div class="btns"><button class="btn sun" data-a="newpw">Enregistrer</button></div>`);return}
  if(mfaStep){$("bar").hidden=true;$("main").innerHTML=card("Vérification en deux étapes",`<p class="note" style="margin-top:0">Entre le code à 6 chiffres affiché par ton application d’authentification.</p><label for="mc">Code</label><input id="mc" inputmode="numeric" autocomplete="one-time-code" maxlength="6"><div class="btns"><button class="btn sun" data-a="mfaok">Valider</button><button class="btn ghost" data-a="mfaout">Annuler</button></div>`);return}
  if(!user){$("main").innerHTML=tab==="ap"?aproposView()+'<div class="btns"><button class="btn ghost" data-a="home">Retour</button></div>':scr==="auth"?authView()+'<div class="btns"><button class="btn ghost" data-a="home">Retour</button></div>':accueil();return}
- const T=tabsList();if(!T.some(x=>x[0]===tab)&&!GRP[tab])tab=bid?T[0][0]:(isPA?"pa":"pf");
- const cur=GRP[tab]||tab;
+ const T=tabsList();if(!T.some(x=>x[0]===tab)&&!G(tab))tab=bid?T[0][0]:(isPA?"pa":spaceOn("user")?"sl":"pf");
+ const cur=G(tab)||tab;
  $("bar").innerHTML=`<div>${T.map(x=>{const n=badge(x[0]);return `<button class="${cur===x[0]?"on":""}" data-a="tab" data-v="${x[0]}"><span class="ic">${ICON[x[0]]}</span>${x[1]}${n?`<i class="bd">${n}</i>`:""}</button>`}).join("")}</div>`;
- const F={td:tableau,vh:flotte,cd:conducteurs,ms:missions,fi:finances,en:carbEnt,rp:rapports,ps:plus,pa:plateforme,pf:profil,ap:aproposView,nt:notifs,au:journal,jr:journee,mc:monCompte,sg:signaler};
- $("main").innerHTML=(GRP[tab]&&tab!=="ps"?`<div class="btns" style="margin:0 0 10px"><button class="btn ghost sm" data-a="tab" data-v="ps" style="flex:none">← Plus</button></div>`:"")+F[tab]();
+ const F={td:tableau,vh:flotte,cd:conducteurs,ms:missions,fi:finances,en:carbEnt,rp:rapports,ps:plus,pa:plateforme,pf:profil,ap:aproposView,nt:notifs,au:journal,jr:journee,mc:monCompte,sg:signaler,sl:chauffeurs,sq:demandes};
+ $("main").innerHTML=(G(tab)&&tab!=="ps"?`<div class="btns" style="margin:0 0 10px"><button class="btn ghost sm" data-a="tab" data-v="ps" style="flex:none">← Plus</button></div>`:"")+F[tab]();
  {const n=qget().length;if(!navigator.onLine||n)$("main").insertAdjacentHTML("afterbegin",`<div class="card" style="border-color:var(--sun);padding:10px 14px">${!navigator.onLine?"📴 Hors connexion. Tes saisies sont gardées sur le téléphone."+(n?" ("+n+" en attente)":""):"⏳ "+n+" saisie(s) en attente d’envoi."}</div>`)}
 }
 
@@ -247,9 +263,9 @@ function conducteurs(){
  const M=D.mem||[],pend=M.filter(x=>x.status==="pending"),drv=M.filter(x=>x.role==="driver"&&x.status==="active"),oth=M.filter(x=>x.role!=="driver"&&x.status==="active");
  const free=(D.veh||[]).filter(v=>!(D.asg||[]).some(a=>a.vehicle_id===v.id)),b=(mems.find(x=>x.business_id===bid&&x.status==="active")||{}).business_accounts||{};
  let h=can("member.manage")?accCard("cd:code","Code de l’entreprise",esc(b.code),false,`<div class="note" style="margin-top:0">À donner à ton équipe pour qu’elle s’inscrive :</div><div class="code">${esc(b.code)}</div>`):"";
- h+=!pend.length?"":card("Demandes d’inscription ("+pend.length+")",pend.map(r=>`<div class="row"><span><b>${esc(nameOf(r.user_id))}</b><br><span class="note" style="margin:0">${RN[r.role]}</span></span>`+(can("member.manage")?`<span class="col">${r.role==="driver"&&can("assignment.write")&&free.length?sel("fv"+r.id,free.map(v=>[v.id,v.plate]))+`<button class="btn sun sm" data-a="accasg" data-id="${r.id}" data-u="${r.user_id}">Accepter et affecter</button>`:`<button class="btn sun sm" data-a="acc" data-id="${r.id}" data-v="active">Accepter</button>`}<button class="btn lnk sm" data-a="acc" data-id="${r.id}" data-v="suspended">Refuser</button></span>`:"")+`</div>`).join(""));
+ h+=!pend.length?"":card("Demandes d’inscription ("+pend.length+")",pend.map(r=>`<div class="row"><span><b>${esc(nameOf(r.user_id))}</b><br><span class="note" style="margin:0">${RN[r.role]}${residOf(r.user_id)?" · 📍 "+esc(residOf(r.user_id)):""}</span></span>`+(can("member.manage")?`<span class="col">${r.role==="driver"&&can("assignment.write")&&free.length?sel("fv"+r.id,free.map(v=>[v.id,v.plate]))+`<button class="btn sun sm" data-a="accasg" data-id="${r.id}" data-u="${r.user_id}">Accepter et affecter</button>`:`<button class="btn sun sm" data-a="acc" data-id="${r.id}" data-v="active">Accepter</button>`}<button class="btn lnk sm" data-a="acc" data-id="${r.id}" data-v="suspended">Refuser</button></span>`:"")+`</div>`).join(""));
  h+=card("Conducteurs ("+drv.length+")",drv.length?drv.map(r=>{const dp=(D.dp||[]).find(x=>x.user_id===r.user_id),as=(D.asg||[]).find(x=>x.driver_id===r.user_id),j=dp&&dp.licence_expires_on?dl(dp.licence_expires_on):null,lt=j===null?"":tag(j<0?["t-bad","Permis expiré"]:j<=5?["t-warn","Permis : "+j+" j"]:["t-ok","Permis valide"]);
-  return acc("cd:"+r.id,esc(nameOf(r.user_id)),lt,`<div class="row" style="border:0"><span>Véhicule</span><b>${as?esc(plateOf(as.vehicle_id)):"—"}</b></div><div class="row" style="border:0"><span>Permis</span><span>${dp&&dp.licence_number?esc(dp.licence_number)+(dp.licence_category?" ("+esc(dp.licence_category)+")":""):"non renseigné"}</span></div>${can("member.manage")?`<div class="btns" style="margin-top:4px"><button class="btn lnk sm" data-a="acc" data-id="${r.id}" data-v="suspended" data-u="${r.user_id}" data-c="1" style="flex:none">Suspendre cet accès</button></div>`:""}`,false)}).join(""):none("Aucun conducteur actif."));
+  return acc("cd:"+r.id,esc(nameOf(r.user_id)),lt,`<div class="row" style="border:0"><span>Véhicule</span><b>${as?esc(plateOf(as.vehicle_id)):"—"}</b></div><div class="row" style="border:0"><span>Résidence</span><span>${residOf(r.user_id)?esc(residOf(r.user_id)):"non renseignée"}</span></div><div class="row" style="border:0"><span>Permis</span><span>${dp&&dp.licence_number?esc(dp.licence_number)+(dp.licence_category?" ("+esc(dp.licence_category)+")":""):"non renseigné"}</span></div>${can("member.manage")?`<div class="btns" style="margin-top:4px"><button class="btn lnk sm" data-a="acc" data-id="${r.id}" data-v="suspended" data-u="${r.user_id}" data-c="1" style="flex:none">Suspendre cet accès</button></div>`:""}`,false)}).join(""):none("Aucun conducteur actif."));
  h+=accCard("cd:oth","Autres membres",oth.length+"",false,oth.map(r=>`<div class="row"><span>${esc(nameOf(r.user_id))}</span><span class="col">${tag(["t-ok",RN[r.role]])}${can("member.manage")&&r.role!=="owner"?`<button class="btn lnk sm" data-a="acc" data-id="${r.id}" data-v="suspended" data-c="1">Suspendre</button>`:""}</span></div>`).join("")||none("—"));
  const sus=M.filter(x=>x.status==="suspended");
  h+=accCard("cd:sus","Accès suspendus ou refusés",sus.length+"",false,sus.length?sus.map(r=>`<div class="row"><span>${esc(nameOf(r.user_id))}<br><span class="note" style="margin:0">${RN[r.role]}</span></span>${can("member.manage")?`<button class="btn ghost sm" data-a="acc" data-id="${r.id}" data-v="active">Réactiver</button>`:""}</div>`).join(""):none("Aucun."));
@@ -302,12 +318,28 @@ function journal(){const L=D.au||[];
  return card("Journal d’activité",(L.length?L.map(x=>{const o=x.old_data||{},n=x.new_data||{},ch=o.status&&n.status&&o.status!==n.status?" : "+esc(o.status)+" → "+esc(n.status):"";
   return `<div class="row"><span><b>${TBL[x.table_name]||esc(x.table_name)}</b> · ${ACT[x.action]||esc(x.action)}${ch}<br><span class="note" style="margin:0">${esc(x.actor?nameOf(x.actor):"Système")} · ${esc((x.at||"").slice(0,16).replace("T"," "))}</span></span></div>`}).join(""):none("Aucune activité."))+`<p class="note">Chaque modification importante est conservée ici : les corrections sont historisées.</p>`)}
 
+function solForm(){
+ const kinds=[["personal","Course personnelle"],["replacement","Remplacement de chauffeur"]].concat(bid&&can("member.manage")?[["join","Rejoindre mon entreprise"]]:[],[["other","Autre"]]);
+ return `<label for="sq_kind">Motif</label>${sel("sq_kind",kinds)}<label for="sq_msg">Message (facultatif)</label><input id="sq_msg" maxlength="500" placeholder="Ex. trajet demain matin"><label for="sq_when">Date et heure (facultatif)</label><input id="sq_when" type="datetime-local"><label for="sq_ct">Ton contact (facultatif)</label><input id="sq_ct" maxlength="80" inputmode="tel" placeholder="+225 …"><p class="note" style="margin:4px 0 0">Ton contact n’est montré au chauffeur que s’il accepte.</p><div class="btns"><button class="btn sun" data-a="dsend">Envoyer la demande</button></div>`}
+function chauffeurs(){
+ const L=DRL||[];let h=card("Trouver un chauffeur",`<p class="note" style="margin:0">Seuls les chauffeurs qui ont choisi d’être visibles apparaissent ici.</p>`);
+ if(!L.length)return h+card("",none("Aucun chauffeur visible pour l’instant."));
+ L.forEach(x=>{const o=selSol===x.id;h+=card("",`<div class="row" style="padding-top:0"><span><b>${esc(x.full_name||"Chauffeur")}</b><br><span class="note" style="margin:0">${esc([TN[x.transport_type],x.zone].filter(Boolean).join(" · "))}</span></span><button class="btn ${o?"ghost":"sun"} sm" data-a="dsol" data-id="${x.id}">${o?"Fermer":"Solliciter"}</button></div>${x.note?`<p class="note" style="margin:6px 0 0">${esc(x.note)}</p>`:""}${o?solForm():""}`)});
+ return h}
+function demandes(){
+ const L=SOL||[],pin=L.filter(x=>x.direction==="in"&&x.status==="pending"),pout=L.filter(x=>x.direction==="out"&&x.status==="pending"),old=L.filter(x=>x.status!=="pending");
+ const row=x=>`<div class="row" style="align-items:flex-start"><span><b>${esc(x.other_name||"")}</b><br><span class="note" style="margin:0">${KL[x.kind]||esc(x.kind)}${x.business_name?" · "+esc(x.business_name):""}${x.when_at?" · "+esc(new Date(x.when_at).toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"})):""}</span>${x.message?`<br><span class="note" style="margin:0">« ${esc(x.message)} »</span>`:""}${x.other_contact?`<br><span class="note" style="margin:0">📞 ${esc(x.other_contact)}</span>`:""}</span><span class="col">${tag(SST[x.status]||["t-warn",x.status])}${x.status==="pending"?(x.direction==="in"?`<button class="btn sun sm" data-a="sresp" data-id="${x.id}" data-v="1">Accepter</button><button class="btn ghost sm" data-a="sresp" data-id="${x.id}" data-v="0">Refuser</button>`:`<button class="btn ghost sm" data-a="scancel" data-id="${x.id}">Annuler</button>`):""}</span></div>`;
+ let h=card("Demandes reçues"+(pin.length?" ("+pin.length+")":""),pin.length?pin.map(row).join(""):none("Aucune demande en attente."));
+ h+=card("Mes demandes envoyées",pout.length?pout.map(row).join(""):none("Aucune demande en attente. Va dans "+(bid?"Plus, puis Trouver un chauffeur.":"Chauffeurs pour solliciter un chauffeur.")));
+ if(old.length)h+=accCard("sq:old","Historique",old.length+"",false,old.map(row).join(""));
+ return h}
 function plus(){
  const g=(t,L)=>L.length?`<h4 class="sec">${t}</h4>`+L.map(x=>`<button class="menu" data-a="tab" data-v="${x[2]}"><span>${x[0]} ${x[1]}</span><span>›</span></button>`).join(""):"";
  const ex=[],cp=[];
  if(P.size&&can("maintenance.read"))ex.push(["🔧","Carburant et entretien","en"]);
  if(P.size&&can("report.read"))ex.push(["📈","Rapports et paramètres","rp"]);
  if(P.size&&can("audit.read"))ex.push(["📜","Journal d’activité","au"]);
+ if(bid){if(can("member.manage")||spaceOn("user"))cp.push(["🔎","Trouver un chauffeur","sl"]);cp.push(["🤝","Demandes"+(pendIn()?" ("+pendIn()+")":""),"sq"])}
  cp.push(["🔔","Notifications"+(unr()?" ("+unr()+")":""),"nt"],["👤","Profil et sécurité","pf"]);
  return `<div class="card">${g("Exploitation",ex)}${g("Mon compte",cp)}${g("Plateforme",isPA?[["🛡️","Plateforme EDSP","pa"]]:[])}${g("Informations",[["ℹ️","À propos","ap"]])}</div>`}
 
@@ -352,9 +384,10 @@ function entretien(){
 function journee(){
  if(!D.my)return card("Ma journée",none("Aucun véhicule ne t’est affecté pour l’instant. Demande à ton propriétaire de t’affecter un véhicule."));
  const v=D.my,ru=D.rule,qs=qget().filter(x=>D.shift&&x.row.shift_id===D.shift.id);
- let h=card("",`<div class="row" style="padding-top:0"><span class="chip">${esc(v.plate)}</span><span class="note" style="margin:0">${esc([v.make,v.model].filter(Boolean).join(" "))} · ${TN[v.transport_type]}${D.line?" · "+esc(D.line.name):""}</span></div><p class="note" style="margin-bottom:0">${ru?(ru.mode==="fixed"?"Versement fixe : "+fmt(ru.fixed_amount)+(ru.period==="week"?" par semaine":" par jour"):ru.mode==="percentage"?"Part du propriétaire : "+ru.percentage+" % du résultat":"Fixe "+fmt(ru.fixed_amount)+" + "+ru.percentage+" % du surplus"):"Aucun contrat défini pour ce véhicule."}</p>`);
+ let h=card("",`<div class="row" style="padding-top:0"><span class="chip">${esc(v.plate)}</span><span class="note" style="margin:0">${esc([v.make,v.model].filter(Boolean).join(" "))} · ${TN[v.transport_type]}${D.line?" · "+esc(D.line.name):""}</span></div>`);
  if((D.minev||[]).length>1)h=card("Véhicule du jour",sel("sv",D.minev.map(x=>[x.id,x.plate]),v.id))+h;
  if(selDate&&selDate!==today())h=card("",`<div class="row" style="padding-top:0"><span>Journée du <b>${esc(selDate)}</b></span><button class="btn ghost sm" data-a="opday" data-v="">Revenir à aujourd’hui</button></div>`)+h;
+ h+=accCard("j:ctr","Mon contrat",ru?(ru.mode==="fixed"?fmt(ru.fixed_amount):ru.percentage+" %"):"",false,`<p class="note" style="margin:0">${ru?(ru.mode==="fixed"?"Versement fixe : "+fmt(ru.fixed_amount)+(ru.period==="week"?" par semaine":" par jour"):ru.mode==="percentage"?"Part du propriétaire : "+ru.percentage+" % du résultat":"Fixe "+fmt(ru.fixed_amount)+" + "+ru.percentage+" % du surplus"):"Aucun contrat défini pour ce véhicule."}</p>`);
  const al=(D.ddocs||[]).filter(d=>d.expires_on&&dl(d.expires_on)<=5);
  if((D.ddocs||[]).length)h+=accCard("j:docs","Documents du véhicule",al.length?"⚠ "+al.length+" à renouveler":D.ddocs.length+"",al.length>0,docRows(D.ddocs));
  if(D.dp0&&D.dp0.licence_expires_on&&dl(D.dp0.licence_expires_on)<=5)h+=card("Permis de conduire",`<p class="note" style="margin:0;color:var(--warn)"><b>Rappel :</b> ton permis expire ${dl(D.dp0.licence_expires_on)<0?"(expiré)":"dans "+dl(D.dp0.licence_expires_on)+" j"}.</p>`);
@@ -365,11 +398,11 @@ function journee(){
  const R=D.rev.concat(qs.filter(x=>x.t==="revenues").map(x=>x.row)),E=D.exp.concat(qs.filter(x=>x.t==="expenses").map(x=>x.row));
  const g=R.reduce((s,x)=>s+x.amount,0),e=E.filter(x=>x.status!=="rejected").reduce((s,x)=>s+x.amount,0),net=g-e,due=dueOf(net,ru);
  const lines=R.map(x=>`<div class="row"><span>Recette${x.source&&x.source!=="course"?" ("+esc(x.source)+")":""}${x.id&&qs.some(q=>q.row.id===x.id)?" · en attente":""}</span><span class="col"><b>+ ${fmt(x.amount)}</b>${open?`<button class="btn ghost sm" data-a="del" data-t="revenues" data-id="${x.id}">✕</button>`:""}</span></div>`).concat(E.map(x=>`<div class="row"><span>${esc(CAT[x.category]||x.category)}${x.note?" – "+esc(x.note):""}${x.status==="rejected"?" · rejetée":""}${qs.some(q=>q.row.id===x.id)?" · en attente":""}${x.status==="approved"?" · approuvée":""}</span><span class="col"><b>− ${fmt(x.amount)}</b>${x.id&&!qs.some(q=>q.row.id===x.id)?(D.rcp&&D.rcp[x.id]?`<button class="btn ghost sm" data-a="seefile" data-f="${esc(D.rcp[x.id])}">📎 Voir</button>`:open?`<button class="btn ghost sm" data-a="photo" data-id="${x.id}">📷 Justificatif</button>`:""):""}${open&&(x.status==="pending"||!x.status)?`<button class="btn ghost sm" data-a="del" data-t="expenses" data-id="${x.id}">✕</button>`:""}</span></div>`));
- h+=card("",`<div class="row" style="padding-top:0"><h3 style="margin:0">Aujourd’hui</h3>${tag(CS[st])}</div>${D.st&&D.st.return_reason?`<p class="note">Motif du renvoi : ${esc(D.st.return_reason)}</p>`:""}${lines.join("")||none("Aucune saisie.")}<div class="row"><span>Résultat</span><b>${fmt(net)}</b></div><div class="row"><span>Dû au propriétaire</span><b>${fmt(due)}</b></div><div class="row"><span>Reste pour toi</span><b>${fmt(net-due)}</b></div>`);
+ h+=card("",`<div class="row" style="padding-top:0"><h3 style="margin:0">Aujourd’hui</h3>${tag(CS[st])}</div>${D.st&&D.st.return_reason?`<p class="note">Motif du renvoi : ${esc(D.st.return_reason)}</p>`:""}<div class="row"><span>Recettes</span><b>+ ${fmt(g)}</b></div><div class="row"><span>Dépenses</span><b>− ${fmt(e)}</b></div><div class="row"><span>Reste pour toi</span><b>${fmt(net-due)}</b></div>`);
  if(open){const tc=(D.trp||[]).length+qs.filter(x=>x.t==="trips").length;h+=accCard("j:trip",D.line?"Tours":"Courses",tc+" aujourd’hui",true,`<div class="row"><span>${D.line?"Tours effectués":"Courses effectuées"}</span><b>${tc}</b></div><label for="tf">Montant (FCFA)</label><input id="tf" type="number" min="1" inputmode="numeric">${D.line?'<label for="tp">Passagers (facultatif)</label><input id="tp" type="number" min="0" inputmode="numeric">':""}<label for="tn">Précision (facultatif)</label><input id="tn"><div class="btns"><button class="btn sun" data-a="trip">${D.line?"Enregistrer le tour":"Enregistrer la course"}</button></div>`)}
- if(open)h+=accCard("j:ent","Dépense ou autre recette","",false,`<label for="et">Type</label><select id="et"><optgroup label="Recette"><option value="rev|course">Recette (course)</option><option value="rev|tour">Recette (tour de ligne)</option><option value="rev|autre">Autre recette</option></optgroup><optgroup label="Dépenses">${Object.keys(CAT).map(k=>`<option value="exp|${k}">${CAT[k]}</option>`).join("")}</optgroup></select><label for="ea">Montant (FCFA)</label><input id="ea" type="number" min="1" inputmode="numeric"><label for="el">Précision (facultatif)</label><input id="el"><label for="eq">Litres (si carburant, facultatif)</label><input id="eq" type="number" min="0" step="0.1" inputmode="decimal"><div class="btns"><button class="btn sun" data-a="ent">Enregistrer</button></div>`);
- if(open&&!D.shift.ended_at)h+=accCard("j:end","Fin de mission","",false,`<label for="ek">Kilométrage d’arrivée (facultatif)</label><input id="ek" type="number" min="0" inputmode="numeric"><div class="btns"><button class="btn ghost" data-a="endsh">Terminer la mission</button></div>`);
- if(open)h+=card("Clôturer la journée",`<p class="note" style="margin-top:0">Quand ta journée est terminée, envoie ta clôture au propriétaire. Tu ne pourras plus la modifier ensuite.</p><div class="btns"><button class="btn sun" data-a="sub">Envoyer la clôture</button></div>`);
+ if(open)h+=accCard("j:ent","Dépense ou autre recette",E.length+" dépense(s)",false,`<label for="et">Type</label><select id="et"><optgroup label="Recette"><option value="rev|course">Recette (course)</option><option value="rev|tour">Recette (tour de ligne)</option><option value="rev|autre">Autre recette</option></optgroup><optgroup label="Dépenses">${Object.keys(CAT).map(k=>`<option value="exp|${k}">${CAT[k]}</option>`).join("")}</optgroup></select><label for="ea">Montant (FCFA)</label><input id="ea" type="number" min="1" inputmode="numeric"><label for="el">Précision (facultatif)</label><input id="el"><label for="eq">Litres (si carburant, facultatif)</label><input id="eq" type="number" min="0" step="0.1" inputmode="decimal"><div class="btns"><button class="btn sun" data-a="ent">Enregistrer</button></div>`);
+ h+=accCard("j:lines","Détail de mes saisies",(R.length+E.length)+"",false,(lines.join("")||none("Aucune saisie."))+`<div class="row"><span>Résultat</span><b>${fmt(net)}</b></div><div class="row"><span>Dû au propriétaire</span><b>${fmt(due)}</b></div>`);
+ if(open)h+=card("Terminer ma journée",`${!D.shift.ended_at?`<label for="ek">Kilométrage d’arrivée (facultatif)</label><input id="ek" type="number" min="0" inputmode="numeric"><div class="btns"><button class="btn ghost" data-a="endsh">Terminer la mission</button></div>`:""}<p class="note">Quand ta journée est terminée, envoie ta clôture au propriétaire. Tu ne pourras plus la modifier ensuite.</p><div class="btns"><button class="btn sun" data-a="sub">Envoyer la clôture</button></div>`);
  return h+pastCard()}
 
 function pastCard(){const L=(D.past||[]).filter(x=>x.shift_date!==(selDate||today()));
@@ -401,9 +434,14 @@ function aproposView(){
 function profil(){
  const nm=(user.user_metadata||{}).full_name||"";
  let h=card(esc(nm||"Mon profil"),`<div class="note" style="margin-top:0">${esc(user.email)}</div>`);
+ h+=accCard("pf:res","📍 Mon lieu de résidence",MYR?esc(MYR):"à renseigner",!MYR,`<label for="rs_res">Commune et quartier</label><input id="rs_res" maxlength="120" placeholder="Ex. Yopougon, Niangon Nord" value="${esc(MYR)}"><div class="btns"><button class="btn sun" data-a="ressave">Enregistrer</button></div><p class="note">Visible par toi et par les personnes de ton entreprise (propriétaire et chauffeurs). Jamais par les usagers.</p>`);
+ h+=accCard("pf:sp_u","🙋 Espace usager",spaceOn("user")?"Actif":"Non activé",false,`<p class="note" style="margin-top:0">Chercher un chauffeur visible et le solliciter (course personnelle, remplacement…).</p><div class="btns"><button class="btn ${spaceOn("user")?"ghost":"sun"}" data-a="spset" data-s="user" data-on="${spaceOn("user")?"0":"1"}">${spaceOn("user")?"Désactiver l’espace usager":"Activer l’espace usager"}</button></div>`);
+ if(!spaceOn("driver"))h+=accCard("pf:sp_d","🚖 Espace chauffeur","Non activé",false,`<p class="note" style="margin-top:0">Être visible, recevoir des demandes d’usagers et de propriétaires, renseigner ton permis.</p><div class="btns"><button class="btn sun" data-a="spset" data-s="driver" data-on="1">Activer l’espace chauffeur</button></div>`);
+ if(spaceOn("driver")){const ml=MYL||{};h+=accCard("pf:vis","🚖 Mon espace chauffeur",ml.visible?"Visible":"Non visible",!MYL,`<label><input type="checkbox" id="ls_vis"${ml.visible?" checked":""}>Je suis visible : les propriétaires et usagers peuvent me solliciter</label><label for="ls_zone">Zone</label><input id="ls_zone" maxlength="80" placeholder="Ex. Cocody, Abidjan" value="${esc(ml.zone||"")}"><label for="ls_type">Type de transport</label>${sel("ls_type",[["","—"]].concat(Object.keys(TN).map(k=>[k,TN[k]])),ml.transport_type||"")}<label for="ls_note">Présentation (facultatif)</label><input id="ls_note" maxlength="300" value="${esc(ml.note||"")}"><label for="ls_ct">Contact (montré seulement si tu acceptes une demande)</label><input id="ls_ct" maxlength="80" inputmode="tel" value="${esc(ml.contact||"")}"><div class="btns"><button class="btn sun" data-a="lssave">Enregistrer</button></div>${mems.some(m=>m.role==="driver"&&m.status==="active")?"":`<div class="btns"><button class="btn lnk sm" data-a="spset" data-s="driver" data-on="0" style="flex:none">Désactiver l’espace chauffeur</button></div>`}`)}
  if(isDrv()){const dp=D.dp0||{};h+=accCard("pf:lic","🪪 Mon permis de conduire",dp.licence_number?esc(dp.licence_number):"à renseigner",!dp.licence_number,`<label for="pn">Numéro de permis</label><input id="pn" value="${esc(dp.licence_number||"")}"><label for="pc">Catégorie</label><input id="pc" value="${esc(dp.licence_category||"")}" placeholder="Ex. B"><label for="px">Date d’expiration</label><input id="px" type="date" value="${esc(dp.licence_expires_on||"")}"><div class="btns"><button class="btn sun" data-a="savelic">Enregistrer</button></div>`)}
- if(mems.length)h+=accCard("pf:esp","🏢 Mes espaces",mems.length+"",mems.length>1||mems.some(m=>m.status==="pending"),mems.map(m=>`<div class="row"><span><b>${esc((m.business_accounts||{}).name||"")}</b><br><span class="note" style="margin:0">${RN[m.role]}</span></span><span class="col">${tag(m.status==="active"?["t-ok","Actif"]:m.status==="pending"?["t-warn","En attente"]:["t-bad","Refusé"])}${m.status==="active"&&m.business_id!==bid?`<button class="btn ghost sm" data-a="sw" data-v="${m.business_id}">Ouvrir</button>`:""}</span></div>`).join(""));
- if(!mems.some(m=>m.role==="owner"))h+=accCard("pf:own","Je suis propriétaire","",!mems.some(m=>m.status==="active"),`<label for="on">Nom de ton entreprise ou activité</label><input id="on" placeholder="Ex. Transports Kouassi"><div class="btns"><button class="btn sun" data-a="nb">Créer mon espace</button></div>`);
+ if(mems.length)h+=accCard("pf:esp","🏢 Mes espaces",mems.length+"",mems.length>1||mems.some(m=>m.status==="pending"),mems.map(m=>`<div class="row"><span><b>${esc((m.business_accounts||{}).name||"")}</b><br><span class="note" style="margin:0">${RN[m.role]} · Code ${esc((m.business_accounts||{}).code||"")}</span></span><span class="col">${tag(m.status==="active"?["t-ok","Actif"]:m.status==="pending"?["t-warn","En attente"]:["t-bad","Refusé"])}${m.status==="active"&&m.business_id!==bid?`<button class="btn ghost sm" data-a="sw" data-v="${m.business_id}">Ouvrir</button>`:""}</span></div>`).join(""));
+ if(!mems.some(m=>m.role==="owner"))h+=accCard("pf:own","🏢 Espace propriétaire","Non activé",!mems.some(m=>m.status==="active"),`<label for="on">Nom de ton entreprise ou activité</label><input id="on" placeholder="Ex. Transports Kouassi"><div class="btns"><button class="btn sun" data-a="nb">Activer l’espace propriétaire</button></div>`);
+ if(mems.some(m=>m.role==="owner"&&m.status==="active"))h+=accCard("pf:own2","🏢 Espace propriétaire","Actif",false,`<p class="note" style="margin:0">Ton espace est actif. Tu le retrouves dans « Mes espaces » ci-dessous, avec son code.</p>`);
  {const mf=D.mf||[];h+=accCard("pf:sec","🔒 Sécurité du compte",mf.length?"2 étapes activées":"2 étapes non activées",!!mfaEnr,mfaEnr?`<p class="note" style="margin-top:0">1. Scanne ce code avec une application d’authentification (Google Authenticator, Microsoft Authenticator…).<br>2. Entre le code à 6 chiffres.</p><div style="text-align:center"><img src="${esc(mfaEnr.qr)}" alt="Code QR" style="width:180px;height:180px;background:#fff;border-radius:10px;padding:6px"></div><p class="note">Clé manuelle : <b>${esc(mfaEnr.secret)}</b></p><label for="mc">Code à 6 chiffres</label><input id="mc" inputmode="numeric" maxlength="6"><div class="btns"><button class="btn sun" data-a="mfacf">Valider</button><button class="btn ghost" data-a="mfacancel">Annuler</button></div>`:mf.length?`<div class="row" style="padding-top:0"><span>Vérification en deux étapes</span>${tag(["t-ok","Activée"])}</div><div class="btns"><button class="btn ghost" data-a="mfaoff" data-f="${esc(mf[0].id)}">Désactiver</button></div>`:`<div class="row" style="padding-top:0"><span>Vérification en deux étapes</span>${tag(["t-warn","Non activée"])}</div><p class="note">Recommandée pour les propriétaires et le super administrateur : un code temporaire s’ajoute au mot de passe.</p><div class="btns"><button class="btn sun" data-a="mfaon">Activer</button></div>`)}
  h+=accCard("pf:pw","🔑 Changer mon mot de passe","",false,`<label for="cp1">Nouveau mot de passe</label><input id="cp1" type="password" autocomplete="new-password" placeholder="8 caractères minimum"><div class="btns"><button class="btn ghost" data-a="chpw">Changer</button></div>`);
  h+=accCard("pf:join","➕ Rejoindre un propriétaire","",!mems.some(m=>m.status==="active"),`<label for="jc">Code du propriétaire</label><input id="jc" placeholder="PROP-XXXXXX" autocapitalize="characters"><label for="jr">Mon rôle</label>${sel("jr",[["driver","Chauffeur"],["fleet_manager","Gestionnaire de flotte"],["accountant","Comptable"],["technician","Technicien"]])}<div class="btns"><button class="btn sun" data-a="jb">Envoyer ma demande</button></div>`);
@@ -415,6 +453,9 @@ const ok=(r,m)=>{if(r.error)throw r.error;if(m)toast(m)};
 document.addEventListener("click",e=>{
  const b=e.target.closest("[data-a]");if(!b)return;if(b.tagName==="A")e.preventDefault();const a=b.dataset.a,d=b.dataset,v=id=>$(id).value;
  if(a==="mode"){mode=d.v;view();return}
+ if(a==="spt"){suSp.has(d.v)?suSp.delete(d.v):suSp.add(d.v);view();return}
+ if(a==="spgo"){if(!suSp.size){toast("Choisis au moins un espace.");return}suGo=true;view();return}
+ if(a==="spback"){suGo=false;view();return}
  if(a==="tab"&&d.v==="au"){run(b,async()=>{const r=await sb.from("audit_log").select("at,actor,action,table_name,old_data,new_data").eq("business_id",bid).order("at",{ascending:false}).limit(60);D.au=r.data||[];tab="au";view()});return}
  if(a==="hist"){selDrv=selDrv===d.u?null:d.u;view();return}
  if(a==="tab"){tab=d.v;view();return}
@@ -426,12 +467,22 @@ document.addEventListener("click",e=>{
   if(a==="signin"||a==="signup"){
    const em=v("em").trim(),pw=v("pw");if(!em||!pw){toast("Renseigne l’e-mail et le mot de passe.");return}
    if(a==="signup"){if(pw.length<8){toast("Mot de passe : 8 caractères minimum.");return}const fn=v("fn").trim();if(!fn){toast("Renseigne ton nom.");return}
-    const r=await sb.auth.signUp({email:em,password:pw,options:{data:{full_name:fn}}});if(r.error)throw r.error;
+    const sbz=suSp.has("owner")?v("sb").trim():"";if(suSp.has("owner")&&!sbz){toast("Renseigne le nom de ton entreprise ou activité.");return}
+    const r=await sb.auth.signUp({email:em,password:pw,options:{data:{full_name:fn,signup_spaces:[...suSp],signup_biz:sbz}}});if(r.error)throw r.error;suSp=new Set();suGo=false;
     if(!r.data.session){toast("Compte créé. Confirme ton e-mail puis connecte-toi.");mode="in";view();return}user=r.data.session.user}
    else{const r=await sb.auth.signInWithPassword({email:em,password:pw});if(r.error)throw r.error;user=r.data.user;if(await mfaCheck())return}
    await load();return}
   if(a==="nb"){const n=v("on").trim();if(!n){toast("Renseigne le nom de ton entreprise.");return}ok(await sb.rpc("create_business",{p_name:n}),"Espace créé.");tab=null;await load();return}
   if(a==="jb"){const c=v("jc").trim();if(!c){toast("Renseigne le code du propriétaire.");return}{const r=await sb.rpc("join_business",{p_code:c,p_role:v("jr")});if(r.error)throw r.error;if(!r.data){toast("Code inconnu. Vérifie le code donné par ton propriétaire.");return}toast("Demande envoyée.")}await load();return}
+  if(a==="spset"){const k=d.s,on=d.on==="1",sp=new Set(MYSP);on?sp.add(k):sp.delete(k);ok(await sb.from("profiles").update({spaces:[...sp]}).eq("id",user.id),on?"Espace activé.":"Espace désactivé.");
+   if(k==="driver"&&!on&&MYL&&MYL.visible)await sb.rpc("set_my_listing",{p_visible:false,p_zone:MYL.zone||"",p_type:MYL.transport_type||"",p_note:MYL.note||"",p_contact:MYL.contact||""});
+   await loadSol();view();return}
+  if(a==="ressave"){const r=await sb.from("profiles").update({residence:v("rs_res").trim()||null}).eq("id",user.id).select();if(r.error)throw r.error;if(!r.data.length)throw new Error("Action refusée.");toast("Lieu de résidence enregistré.");await load();return}
+  if(a==="lssave"){ok(await sb.rpc("set_my_listing",{p_visible:$("ls_vis").checked,p_zone:v("ls_zone"),p_type:v("ls_type"),p_note:v("ls_note"),p_contact:v("ls_ct")}),"Espace chauffeur enregistré.");await loadSol();view();return}
+  if(a==="dsol"){selSol=selSol===d.id?null:d.id;view();return}
+  if(a==="dsend"){const k=v("sq_kind"),w=v("sq_when");ok(await sb.rpc("solicit_driver",{p_driver:selSol,p_kind:k,p_message:v("sq_msg"),p_when:w?new Date(w).toISOString():null,p_contact:v("sq_ct"),p_business:k==="join"?bid:null}),"Demande envoyée.");selSol=null;await loadSol();tab="sq";view();return}
+  if(a==="sresp"){const yes=d.v==="1";ok(await sb.rpc("respond_solicitation",{p_id:d.id,p_accept:yes}),yes?"Demande acceptée.":"Demande refusée.");await load();return}
+  if(a==="scancel"){ok(await sb.rpc("cancel_solicitation",{p_id:d.id}),"Demande annulée.");await loadSol();view();return}
   if(a==="forgot"){const em=v("em").trim();if(!em){toast("Renseigne d’abord ton e-mail.");return}ok(await sb.auth.resetPasswordForEmail(em,{redirectTo:location.origin+location.pathname}),"E-mail envoyé. Ouvre le lien reçu.");return}
   if(a==="newpw"){const pw=v("np");if(pw.length<8){toast("8 caractères minimum.");return}ok(await sb.auth.updateUser({password:pw}),"Mot de passe changé.");recov=false;await load();return}
   if(a==="phsend"){phNum=v("ph").trim();if(!phNum){toast("Renseigne ton téléphone.");return}ok(await sb.auth.signInWithOtp({phone:phNum,options:{data:{full_name:v("fn").trim()}}}),"Code envoyé par SMS.");phStep=1;view();return}

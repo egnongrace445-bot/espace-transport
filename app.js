@@ -201,11 +201,12 @@ function authView(){if(mode==="ph"&&SMS)return phoneView();const up=mode==="up";
  <p class="note">Phase de test : connexion par e-mail. Le code SMS viendra plus tard.</p>`)}
 
 const ICON={sl:"🔎",sq:"🤝",td:"📊",vh:"🚗",cd:"👥",ms:"📍",fi:"💰",ps:"☰",jr:"🚖",mc:"💳",sg:"⚠️"};
-const GRP={ms:"ps",en:"ps",rp:"ps",pa:"ps",pf:"ps",ap:"ps",nt:"ps",au:"ps"};
+const GRP={ms:"td",en:"td",rp:"td",au:"td",pa:"ps",pf:"ps",ap:"ps",nt:"ps",gd:"ps",ct:"ps"};
+const BK={td:"Tableau",sl:"Demande",ps:"Plus"};
 const VST={in_service:["t-ok","En service"],available:["t-ok","Disponible"],maintenance:["t-warn","En maintenance"],immobilised:["t-bad","Immobilisé"]};
 const IT={accident:"Accident",police_check:"Contrôle de police",theft:"Vol",dispute:"Litige",breakdown:"Panne en route",other:"Autre"};
 const IS={open:["t-bad","Ouvert"],handled:["t-warn","Pris en charge"],closed:["t-ok","Clôturé"]};
-const G=t=>t==="sq"?(curSp==="owner"?"ps":null):t==="sl"?null:GRP[t];
+const G=t=>t==="sq"?(curSp==="owner"?"sl":null):t==="sl"?null:GRP[t];
 function tabsList(){const T=[];
  if(curSp==="owner"){if(P.size){T.push(["td","Tableau"]);
    if(can("vehicle.read"))T.push(["vh","Véhicules"]);
@@ -228,8 +229,8 @@ function view(){
  const T=tabsList();if(!T.some(x=>x[0]===tab)&&!G(tab))tab=T[0][0];
  const cur=G(tab)||tab;
  $("bar").innerHTML=`<div>${T.map(x=>{const n=badge(x[0]);return `<button class="${cur===x[0]?"on":""}" data-a="tab" data-v="${x[0]}"><span class="ic">${ICON[x[0]]}</span>${x[1]}${n?`<i class="bd">${n}</i>`:""}</button>`}).join("")}</div>`;
- const F={td:tableau,vh:flotte,cd:conducteurs,ms:missions,fi:finances,en:carbEnt,rp:rapports,ps:plus,pa:plateforme,pf:profil,ap:aproposView,nt:notifs,au:journal,jr:journee,mc:monCompte,sg:signaler,sl:chauffeurs,sq:demandes};
- $("main").innerHTML=(G(tab)&&tab!=="ps"?`<div class="btns" style="margin:0 0 10px"><button class="btn ghost sm" data-a="tab" data-v="ps" style="flex:none">← Plus</button></div>`:"")+F[tab]();
+ const F={td:tableau,vh:flotte,cd:conducteurs,ms:missions,fi:finances,en:carbEnt,rp:rapports,ps:plus,pa:plateforme,pf:profil,ap:aproposView,nt:notifs,au:journal,jr:journee,mc:monCompte,sg:signaler,sl:chauffeurs,sq:demandes,gd:guide,ct:contact};
+ $("main").innerHTML=(G(tab)&&tab!=="ps"?`<div class="btns" style="margin:0 0 10px"><button class="btn ghost sm" data-a="tab" data-v="${G(tab)}" style="flex:none">← ${BK[G(tab)]||"Plus"}</button></div>`:"")+(curSp&&!introSeen(curSp)&&tab===T[0][0]?introCard():"")+F[tab]();
  {const n=qget().length;if(!navigator.onLine||n)$("main").insertAdjacentHTML("afterbegin",`<div class="card" style="border-color:var(--sun);padding:10px 14px">${!navigator.onLine?"📴 Hors connexion. Tes saisies sont gardées sur le téléphone."+(n?" ("+n+" en attente)":""):"⏳ "+n+" saisie(s) en attente d’envoi."}</div>`)}
 }
 
@@ -278,6 +279,8 @@ function tableau(){
  h+=card("À traiter"+(al.length?" ("+al.length+")":""),al.length?top.map(row).join("")+(rest.length?acc("td:more","Voir les "+rest.length+" autres","",rest.map(row).join(""),false):""):none("Rien à traiter pour l’instant."));
  /* Niveau 2 : chiffres de la flotte, repliés */
  h+=accCard("td:fleet","Ma flotte en un coup d’œil",V.length+" véhicule(s) · "+drv.length+" conducteur(s)",false,`<div class="row" style="border:0"><span>Véhicules</span><b>${V.length}</b></div><div class="row" style="border:0"><span>Conducteurs actifs</span><b>${drv.length}</b></div><div class="btns" style="margin-top:4px"><button class="btn lnk sm" data-a="tab" data-v="vh" style="flex:none">Ouvrir les véhicules</button><button class="btn lnk sm" data-a="tab" data-v="cd" style="flex:none">Ouvrir les conducteurs</button></div>`);
+ {const TL=[];if(can("shift.read_all"))TL.push(["📍","Missions","ms"]);if(P.size&&can("maintenance.read"))TL.push(["🔧","Carburant et entretien","en"]);if(P.size&&can("report.read"))TL.push(["📈","Rapports et paramètres","rp"]);if(P.size&&can("audit.read"))TL.push(["📜","Journal d’activité","au"]);
+  if(TL.length)h+=accCard("td:tools","🧰 Outils de gestion",TL.length+"",false,TL.map(x=>`<button class="menu" data-a="tab" data-v="${x[2]}"><span>${x[0]} ${x[1]}</span><span>›</span></button>`).join(""))}
  return h}
 
 function conducteurs(){
@@ -343,7 +346,7 @@ function solForm(){
  const kinds=[["personal","Course personnelle"],["replacement","Remplacement de chauffeur"]].concat(bid&&can("member.manage")?[["join","Rejoindre mon entreprise"]]:[],[["other","Autre"]]);
  return `<label for="sq_kind">Motif</label>${sel("sq_kind",kinds)}<label for="sq_msg">Message (facultatif)</label><input id="sq_msg" maxlength="500" placeholder="Ex. trajet demain matin"><label for="sq_when">Date et heure (facultatif)</label><input id="sq_when" type="datetime-local"><label for="sq_ct">Ton numéro de téléphone</label><input id="sq_ct" type="tel" maxlength="25" inputmode="tel" placeholder="+225 07 00 00 00 00" value="${esc(MYPH)}"><p class="note" style="margin:4px 0 0">Ton numéro n’est montré qu’après acceptation. Ton code ${esc(MYCODE)} est envoyé avec la demande.</p><div class="btns"><button class="btn sun" data-a="dsend">Envoyer la demande</button></div>`}
 function chauffeurs(){
- const L=DRL||[];let h=card("Demande chauffeur",`<p class="note" style="margin:0">Seuls les chauffeurs qui ont choisi d’être visibles apparaissent ici.<br>🟢 en ligne · 🔵 en échange · 🔴 travail accepté (plus joignable)</p>`);
+ const L=DRL||[];let h=card("Demande chauffeur",`<p class="note" style="margin:0">Seuls les chauffeurs qui ont choisi d’être visibles apparaissent ici.<br>🟢 en ligne · 🔵 en échange · 🔴 travail accepté (plus joignable)</p>${curSp==="owner"?`<div class="btns"><button class="btn ghost sm" data-a="tab" data-v="sq">Mes demandes envoyées</button></div>`:""}`);
  if(!L.length)return h+card("",none("Aucun chauffeur visible pour l’instant."));
  L.forEach(x=>{const bz=x.status==="accepted",o=!bz&&selSol===x.id;h+=card("",`<div class="row" style="padding-top:0"><span><b>${esc(x.full_name||"Chauffeur")}</b><br><span class="note" style="margin:0">${STE[x.status]||STE.online}</span><br><span class="note" style="margin:0">${esc([x.public_code,TN[x.transport_type],x.zone].filter(Boolean).join(" · "))}</span></span>${bz?`<span class="tag t-warn">Indisponible</span>`:`<button class="btn ${o?"ghost":"sun"} sm" data-a="dsol" data-id="${x.id}">${o?"Fermer":"Solliciter"}</button>`}</div>${bz?`<p class="note" style="margin:6px 0 0">Il a accepté un travail : il ne peut plus être contacté pour l’instant.</p>`:""}${x.note?`<p class="note" style="margin:6px 0 0">${esc(x.note)}</p>`:""}${o?solForm():""}`)});
  return h}
@@ -365,16 +368,60 @@ function hub(){
  h+=accCard("pf:join","➕ Rejoindre une entreprise","",!mems.some(m=>m.status==="active"),`<label for="jc">Code de l’entreprise</label><input id="jc" placeholder="PROP-XXXXXX" autocapitalize="characters"><label for="jr">Mon rôle</label>${sel("jr",[["driver","Chauffeur"],["fleet_manager","Gestionnaire de flotte"],["accountant","Comptable"],["technician","Technicien"]])}<div class="btns"><button class="btn sun" data-a="jb">Envoyer ma demande</button></div>`);
  if(mems.length)h+=accCard("hub:esp","🏢 Mes entreprises",mems.length+"",mems.length>1||mems.some(m=>m.status==="pending"),mems.map(m=>`<div class="row"><span><b>${esc((m.business_accounts||{}).name||"")}</b><br><span class="note" style="margin:0">${RN[m.role]} · Code ${esc((m.business_accounts||{}).code||"")}</span></span><span class="col">${tag(m.status==="active"?["t-ok","Actif"]:m.status==="pending"?["t-warn","En attente"]:["t-bad","Refusé"])}${m.status==="active"&&m.business_id!==bid?`<button class="btn ghost sm" data-a="sw" data-v="${m.business_id}">Ouvrir</button>`:""}</span></div>`).join(""));
  return h}
+const APP_VER="v27";
+const SUPPORT=Object.assign({whatsapp:"",phone:"",email:"",hours:""},(typeof TM_CONFIG!=="undefined"&&TM_CONFIG.support)||{});
+const li=a=>`<ol style="margin:6px 0 0 18px;padding:0">${a.map(x=>`<li style="margin:5px 0">${x}</li>`).join("")}</ol>`;
+const GUIDE={
+ owner:[
+  ["🚀 Pour commencer","4 étapes",li(["Touche <b>Véhicules</b>, puis <b>➕ Ajouter un véhicule</b>. Remplis la plaque, la marque et le modèle, puis touche <b>Ajouter</b>.","Fais venir tes chauffeurs : donne-leur le code de ton entreprise (dans <b>Conducteurs</b>, rubrique <b>Code de l’entreprise</b>) ou cherche-les avec <b>Demande</b>.","Dans <b>Conducteurs</b>, touche <b>Accepter et affecter</b> pour donner un véhicule à un chauffeur.","Dans <b>Véhicules</b>, règle le contrat du véhicule puis touche <b>Enregistrer le contrat</b>."])],
+  ["👥 Mes chauffeurs","Accepter, suivre, suspendre",li(["Dans <b>Conducteurs</b>, chaque nouvelle demande a deux boutons : <b>Accepter</b> ou <b>Refuser</b>.","Chaque chauffeur a un rond de couleur : 🟢 en ligne, 🔵 en échange, 🔴 travail accepté, ⚫ pas en ligne.","Pour retirer un accès : <b>Suspendre cet accès</b>."])],
+  ["🔎 Demander un chauffeur","Solliciter un chauffeur visible",li(["Touche <b>Demande</b> : tu vois les chauffeurs qui ont choisi d’être visibles.","Touche <b>Solliciter</b>, choisis le motif (par exemple <b>Rejoindre mon entreprise</b>), vérifie ton numéro, puis touche <b>Envoyer la demande</b>.","Pour suivre la réponse, touche <b>Mes demandes envoyées</b> (en haut de l’écran Demande).","Quand le chauffeur accepte, son numéro apparaît. Avec <b>Rejoindre mon entreprise</b>, il est rattaché tout de suite."])],
+  ["💰 Argent et clôtures","Valider les journées",li(["Chaque soir, le chauffeur envoie sa clôture. Dans <b>Finances</b>, touche <b>Valider</b> ou <b>Renvoyer</b> (avec un motif).","Pour une dépense : <b>Approuver</b> ou <b>Rejeter</b>.","Pour noter un versement ou une avance : <b>➕ Enregistrer un mouvement</b>."])],
+  ["📊 Tableau et outils","Ce qui demande ton attention",li(["<b>Tableau</b> montre l’argent du jour et ce qui est <b>À traiter</b>.","En bas, <b>🧰 Outils de gestion</b> : Missions, Carburant et entretien, Rapports et paramètres, Journal d’activité."])]
+ ],
+ driver:[
+  ["🚖 Ma journée","Du début à la clôture",li(["Touche <b>Ma journée</b>, puis <b>Commencer la journée</b>.","À chaque client : <b>Enregistrer la course</b> (ou <b>Enregistrer le tour</b> si tu travailles sur une ligne).","Une dépense (carburant…) : ouvre <b>Dépense ou autre recette</b>.","Le soir : <b>Terminer la mission</b>, puis <b>Envoyer la clôture</b>. Tu ne pourras plus modifier ensuite.","<span class=\"note\" style=\"margin:0\">Cet écran apparaît quand un propriétaire t’a rattaché à son entreprise.</span>"])],
+  ["📥 Les demandes reçues","Accepter ou refuser",li(["Touche <b>Demandes</b>. Pour chaque demande : <b>Accepter</b> ou <b>Refuser</b>.","🔵 = une demande attend ta réponse. 🔴 = tu as accepté un travail : on ne peut plus te contacter.","Quand ton travail est terminé : <b>Plus</b>, <b>Profil et sécurité</b>, <b>🚖 Mon espace chauffeur</b>, puis <b>Je suis de nouveau disponible</b>."])],
+  ["👁️ Être visible","Apparaître dans la liste",li(["Touche <b>Plus</b>, <b>Profil et sécurité</b>, puis <b>🚖 Mon espace chauffeur</b>.","Coche <b>Je suis visible</b>, remplis ta zone et ton type de transport, puis touche <b>Enregistrer</b>.","Il faut un numéro de téléphone : ajoute-le dans <b>📍 Mes coordonnées</b>.","Pour ne plus apparaître : décoche la case et touche <b>Enregistrer</b>."])],
+  ["⚠️ Signaler un problème","Panne ou incident",li(["Touche <b>Signaler</b>.","Une panne : touche <b>Envoyer au propriétaire</b>.","Un accident ou un contrôle de police : touche <b>Déclarer</b>."])],
+  ["💳 Mon compte","Versements au propriétaire",li(["Touche <b>Mon compte</b>, puis <b>➕ Déclarer un versement</b>.","Remplis le montant et touche <b>Déclarer</b>."])]
+ ],
+ user:[
+  ["🔎 Trouver un chauffeur","Envoyer une demande",li(["Touche <b>Chauffeurs</b> : tu vois les chauffeurs visibles, avec leur couleur.","Touche <b>Solliciter</b> et choisis le motif : <b>Course personnelle</b>, <b>Remplacement de chauffeur</b> ou <b>Autre</b>.","Ajoute un message, une date si besoin, vérifie ton numéro, puis touche <b>Envoyer la demande</b>."])],
+  ["🤝 Suivre mes demandes","En attente, acceptée, refusée",li(["Touche <b>Demandes</b>.","Tant que le chauffeur n’a pas répondu, tu peux toucher <b>Annuler</b>.","S’il accepte, son numéro apparaît : tu peux l’appeler."])],
+  ["🎨 Les couleurs des chauffeurs","Qui est joignable ?",li(["🟢 en ligne : il peut répondre.","🔵 en échange : il discute déjà avec quelqu’un, tu peux quand même écrire.","🔴 plus joignable : il a accepté un travail, le bouton devient <b>Indisponible</b>.","⚫ pas en ligne : il n’apparaît pas dans la liste."])]
+ ],
+ common:[
+  ["📍 Mon numéro et mon code","À renseigner une fois",li(["Touche <b>Plus</b>, puis <b>Profil et sécurité</b>, puis <b>📍 Mes coordonnées</b>.","Écris ton numéro de téléphone et ta commune, puis touche <b>Enregistrer</b>.","Ton code <b>EDSP-…</b> s’y trouve aussi : il t’identifie dans l’application."])],
+  ["🧩 Changer d’espace","Un compte, plusieurs espaces",li(["Touche le bouton <b>⇄</b> en haut de l’écran, ou <b>Plus</b> puis <b>Mes espaces</b>.","Touche l’espace où tu veux entrer. Pour en activer un autre, descends jusqu’à <b>Activer mes espaces</b>."])],
+  ["🎨 Changer les couleurs","Couleur de chaque espace",li(["Touche <b>Plus</b>, <b>Profil et sécurité</b>, puis <b>🎨 Couleurs de mes espaces</b>.","Touche un rond de couleur. La case <b>Colorer aussi les cadres de l’espace</b> règle les cadres."])],
+  ["🔒 Sécurité du compte","Mot de passe et deux étapes",li(["Touche <b>Plus</b>, puis <b>Profil et sécurité</b>.","Ouvre <b>Changer mon mot de passe</b> ou <b>Sécurité du compte</b> (vérification en deux étapes)."])],
+  ["🎧 Besoin d’aide ?","Écrire au service client",li(["Touche <b>Plus</b>, puis <b>Contact service client</b>."])]
+ ]
+};
+function guide(){
+ const sp=curSp||"owner",it=GUIDE[sp]||[];
+ let h=card(SPI[sp]+" Guide de l’espace "+SPN[sp].toLowerCase(),`<p class="note" style="margin:0">Touche un sujet pour voir les étapes.</p>`);
+ h+=`<div class="card tight">`+it.map((x,i)=>acc("gd:"+sp+i,x[0],x[1],x[2],i===0)).join("")+`</div>`;
+ h+=`<h4 class="sec">Pour tous les espaces</h4><div class="card tight">`+GUIDE.common.map((x,i)=>acc("gd:c"+i,x[0],x[1],x[2],false)).join("")+`</div>`;
+ return h}
+function contact(){
+ const msg="Bonjour, je suis "+((user.user_metadata||{}).full_name||"")+" (code "+MYCODE+")"+(curSp?", espace "+SPN[curSp].toLowerCase():"")+". Version "+APP_VER+".",
+  wa=(SUPPORT.whatsapp||"").replace(/\D/g,""),ph=(SUPPORT.phone||"").replace(/[^\d+]/g,""),em=(SUPPORT.email||"").trim(),R=[];
+ const bt=(i,t,u)=>`<button class="menu" data-a="ext" data-u="${esc(u)}"><span>${i} ${t}</span><span>›</span></button>`;
+ if(wa)R.push(bt("💬","Écrire sur WhatsApp","https://wa.me/"+wa+"?text="+encodeURIComponent(msg)));
+ if(ph)R.push(bt("📞","Appeler le service client","tel:"+ph));
+ if(em)R.push(bt("✉️","Envoyer un e-mail","mailto:"+em+"?subject="+encodeURIComponent("Aide EDSP Transport Manager")+"&body="+encodeURIComponent(msg)));
+ let h=card("Contact service client",R.length?R.join("")+(SUPPORT.hours?`<p class="note">${esc(SUPPORT.hours)}</p>`:"")+`<p class="note">Ton nom, ton code ${esc(MYCODE)} et ton espace sont ajoutés au message pour qu’on te reconnaisse.</p>`:`<p style="margin:0">Le service client sera bientôt joignable ici.</p><p class="note">En attendant, ouvre le guide : la réponse y est peut-être déjà.</p>`);
+ return h+card("",`<button class="menu" data-a="tab" data-v="gd"><span>📘 Guide d’utilisation</span><span>›</span></button>`)}
+const INTRO={owner:"Ton espace Propriétaire sert à gérer tes véhicules, tes chauffeurs et ton argent.",driver:"Ton espace Chauffeur sert à suivre ta journée, recevoir des demandes et signaler un problème.",user:"Ton espace Usager sert à trouver un chauffeur et à lui envoyer une demande."};
+const introSeen=sp=>{try{return localStorage.getItem("tm-intro-"+sp)==="1"}catch(e){return true}};
+const introCard=()=>card(SPI[curSp]+" Bienvenue dans ton espace "+SPN[curSp].toLowerCase(),`<p style="margin:0">${INTRO[curSp]}</p><div class="btns"><button class="btn sun" data-a="tab" data-v="gd">Voir le guide</button><button class="btn ghost" data-a="intro" data-s="${curSp}">Compris</button></div>`);
 function plus(){
  const g=(t,L)=>L.length?`<h4 class="sec">${t}</h4>`+L.map(x=>`<button class="menu" data-a="${x[2]==="hub"?"hub":"tab"}" data-v="${x[2]}"><span>${x[0]} ${x[1]}</span><span>›</span></button>`).join(""):"";
- const ex=[],cp=[];
- if(curSp==="owner"&&P.size&&can("maintenance.read"))ex.push(["🔧","Carburant et entretien","en"]);
- if(curSp==="owner"&&P.size&&can("report.read"))ex.push(["📈","Rapports et paramètres","rp"]);
- if(curSp==="owner"&&P.size&&can("audit.read"))ex.push(["📜","Journal d’activité","au"]);
- if(curSp==="owner"&&can("shift.read_all"))ex.unshift(["📍","Missions","ms"]);
- if(curSp==="owner")cp.push(["🤝","Demandes envoyées","sq"]);
- cp.push(["🔔","Notifications"+(unr()?" ("+unr()+")":""),"nt"],["👤","Profil et sécurité","pf"],["🧩","Mes espaces","hub"]);
- return `<div class="card">${g("Exploitation",ex)}${g("Mon compte",cp)}${g("Plateforme",isPA?[["🛡️","Plateforme EDSP","pa"]]:[])}${g("Informations",[["ℹ️","À propos","ap"]])}</div>`}
+ const aide=[["📘","Guide d’utilisation","gd"],["🎧","Contact service client","ct"],["ℹ️","À propos","ap"]];
+ const cp=[["🔔","Notifications"+(unr()?" ("+unr()+")":""),"nt"],["👤","Profil et sécurité","pf"],["🧩","Mes espaces","hub"]];
+ return `<div class="card">${g("Aide",aide)}${g("Mon compte",cp)}</div>`}
 
 function flotte(){
  const V=D.veh||[],drv=(D.mem||[]).filter(x=>x.role==="driver"&&x.status==="active");let h="";
@@ -487,6 +534,8 @@ document.addEventListener("click",e=>{
  if(a==="spback"){suGo=false;view();return}
  if(a==="tab"&&d.v==="au"){run(b,async()=>{const r=await sb.from("audit_log").select("at,actor,action,table_name,old_data,new_data").eq("business_id",bid).order("at",{ascending:false}).limit(60);D.au=r.data||[];tab="au";view()});return}
  if(a==="frm"){FRM=b.checked;try{localStorage.setItem("tm-frm",FRM?"1":"0")}catch(e){}view();return}
+ if(a==="intro"){try{localStorage.setItem("tm-intro-"+d.s,"1")}catch(e){}view();return}
+ if(a==="ext"){if(/^(tel:|mailto:)/.test(d.u))location.href=d.u;else window.open(d.u,"_blank","noopener");return}
  if(a==="hub"){curSp=null;tab=null;try{sessionStorage.removeItem("tm-sp")}catch(e){}view();return}
  if(a==="hist"){selDrv=selDrv===d.u?null:d.u;view();return}
  if(a==="tab"){tab=d.v;view();return}

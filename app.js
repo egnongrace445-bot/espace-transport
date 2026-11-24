@@ -35,7 +35,7 @@ async function upload(f,tt,tid,dt,extra){const b=await shrink(f),ext=b.type==="a
  const r=await sb.from("documents").insert(Object.assign({business_id:bid,target_type:tt,target_id:tid,doc_type:dt,file_path:path,uploaded_by:user.id},extra||{}));if(r.error)throw r.error;return path}
 async function openFile(path){const s=await sb.storage.from("justificatifs").createSignedUrl(path,600);if(s.error)throw s.error;window.open(s.data.signedUrl,"_blank","noopener,noreferrer")}
 
-let sb=null,user=null,mems=[],bid=null,roles=[],P=new Set(),D={},tab=null,mode="in",busy=false,isPA=false,scr="home",rpP=7,recov=false,mfaStep=null,mfaEnr=null,phStep=0,phNum="",lastUn=-1,selDate=null,selDrv=null,suSp=new Set(),suGo=false,MYSP=[],signupTried=false,SOL=[],DRL=[],MYL=null,selSol=null,MYR="",MYPH="",MYCODE="",MYST="offline",TST={};
+let sb=null,user=null,mems=[],bid=null,roles=[],P=new Set(),D={},tab=null,mode="in",busy=false,isPA=false,scr="home",rpP=7,recov=false,mfaStep=null,mfaEnr=null,phStep=0,phNum="",lastUn=-1,selDate=null,selDrv=null,suSp=new Set(),pendEm="",suGo=false,MYSP=[],signupTried=false,SOL=[],DRL=[],MYL=null,selSol=null,MYR="",MYPH="",MYCODE="",MYST="offline",TST={};
 const can=p=>P.has(p),isDrv=()=>roles.includes("driver");
 const QK="tm-queue2",qraw=()=>{try{return JSON.parse(localStorage.getItem(QK)||"[]")}catch(e){return[]}};
 /* file d'attente hors connexion : chaque saisie est rattachée à son auteur, un autre compte sur le même téléphone ne la voit ni ne l'envoie */
@@ -46,6 +46,7 @@ function msg(e){const m=(e&&e.message)||String(e);
  if(/already registered/i.test(m))return"Cette adresse e-mail a déjà un compte.";
  if(/Password should be/i.test(m))return"Mot de passe trop court (8 caractères minimum).";
  if(/rate limit/i.test(m))return"Trop d’essais. Réessaie dans quelques minutes.";
+ if(/expired or is invalid|otp_expired|invalid.*token/i.test(m))return"Code incorrect ou expiré. Touche « Renvoyer le code ».";
  if(/duplicate key/i.test(m))return"Cet élément existe déjà.";
  if(/fetch|network/i.test(m))return"Pas de connexion internet.";
  if(/row-level security/i.test(m))return"Action non autorisée pour ton rôle.";
@@ -191,7 +192,8 @@ const plateOf=id=>{const v=(D.veh||[]).find(x=>x.id===id);return v?v.plate:""};
 /* ---------- écrans ---------- */
 const authTabs=()=>`<div class="seg"><button class="btn ${mode==="in"?"":"ghost"}" data-a="mode" data-v="in">Se connecter</button><button class="btn ${mode==="up"?"":"ghost"}" data-a="mode" data-v="up">Créer un compte</button>${SMS?`<button class="btn ${mode==="ph"?"":"ghost"}" data-a="mode" data-v="ph">Téléphone</button>`:""}</div>`;
 function phoneView(){return card("",authTabs()+(phStep?`<label for="pt">Code reçu par SMS</label><input id="pt" inputmode="numeric" autocomplete="one-time-code"><div class="btns"><button class="btn sun" data-a="phverify">Valider</button></div>`:`<label for="fn">Nom complet (nouveau compte)</label><input id="fn"><label for="ph">Téléphone (+225…)</label><input id="ph" type="tel" inputmode="tel" placeholder="+225 07 00 00 00 00"><div class="btns"><button class="btn sun" data-a="phsend">Recevoir le code</button></div>`))}
-function authView(){if(mode==="ph"&&SMS)return phoneView();const up=mode==="up";
+function codeView(){return card("Confirme ton e-mail",`<p style="margin:0">Nous avons envoyé un code à <b>${esc(pendEm)}</b>. Écris-le ci-dessous.</p><label for="cd">Code reçu par e-mail</label><input id="cd" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="Ex. 123456"><div class="btns"><button class="btn sun" data-a="vcode">Valider le code</button></div><div class="btns"><button class="btn ghost sm" data-a="rcode">Renvoyer le code</button><button class="btn ghost sm" data-a="mode" data-v="in">Retour</button></div><p class="note">Pas reçu ? Regarde dans les Spams.</p>`)}
+function authView(){if(mode==="code")return codeView();if(mode==="ph"&&SMS)return phoneView();const up=mode==="up";
  if(up&&!suGo)return card("",authTabs()+`<h3 style="margin:14px 0 4px">Quels espaces veux-tu activer ?</h3><p class="note" style="margin:0 0 8px">Un seul compte, plusieurs espaces. Tu peux en choisir plusieurs et changer plus tard.</p>`+[["user","🙋 Usager","Je cherche un chauffeur"],["driver","🚖 Chauffeur","Je conduis et je peux être sollicité"],["owner","🏢 Propriétaire","J’ai des véhicules à gérer"]].map(x=>`<button class="menu" data-a="spt" data-v="${x[0]}"><span>${suSp.has(x[0])?"✅":"⬜"} ${x[1]}<br><span class="note" style="margin:0">${x[2]}</span></span></button>`).join("")+`<div class="btns"><button class="btn sun" data-a="spgo">Continuer</button></div>`);
  return card("",`${authTabs()}
  ${up?`<div class="row" style="padding-top:0"><span>Espaces : <b>${[...suSp].map(k=>SPN[k]).join(", ")}</b></span><button class="btn ghost sm" data-a="spback">Changer</button></div><label for="fn">Nom complet</label><input id="fn" autocomplete="name"><label for="ph2">Numéro de téléphone</label><input id="ph2" type="tel" inputmode="tel" maxlength="25" autocomplete="tel" placeholder="+225 07 00 00 00 00">${suSp.has("owner")?'<label for="sb">Nom de ton entreprise ou activité</label><input id="sb" placeholder="Ex. Transports Kouassi">':""}`:""}
@@ -550,9 +552,11 @@ document.addEventListener("click",e=>{
     const phn=v("ph2").trim();if(!okPhone(phn)){toast("Renseigne ton numéro de téléphone.");return}
     const sbz=suSp.has("owner")?v("sb").trim():"";if(suSp.has("owner")&&!sbz){toast("Renseigne le nom de ton entreprise ou activité.");return}
     const r=await sb.auth.signUp({email:em,password:pw,options:{data:{full_name:fn,signup_phone:phn,signup_spaces:[...suSp],signup_biz:sbz}}});if(r.error)throw r.error;suSp=new Set();suGo=false;
-    if(!r.data.session){toast("Compte créé. Confirme ton e-mail puis connecte-toi.");mode="in";view();return}user=r.data.session.user}
-   else{const r=await sb.auth.signInWithPassword({email:em,password:pw});if(r.error)throw r.error;user=r.data.user;if(await mfaCheck())return}
+    if(!r.data.session){pendEm=em;mode="code";toast("Code envoyé par e-mail.");view();return}user=r.data.session.user}
+   else{const r=await sb.auth.signInWithPassword({email:em,password:pw});if(r.error){if(/not confirmed/i.test(r.error.message||"")){pendEm=em;await sb.auth.resend({type:"signup",email:em});mode="code";toast("E-mail pas encore confirmé : un code vient d’être envoyé.");view();return}throw r.error}user=r.data.user;if(await mfaCheck())return}
    await load();return}
+  if(a==="vcode"){const t=v("cd").replace(/\s/g,"");if(t.length<6){toast("Écris le code reçu par e-mail.");return}const r=await sb.auth.verifyOtp({email:pendEm,token:t,type:"signup"});if(r.error)throw r.error;user=r.data.user||(r.data.session&&r.data.session.user);mode="in";await load();return}
+  if(a==="rcode"){const r=await sb.auth.resend({type:"signup",email:pendEm});if(r.error)throw r.error;toast("Nouveau code envoyé.");return}
   if(a==="nb"){const n=v("on").trim();if(!n){toast("Renseigne le nom de ton entreprise.");return}ok(await sb.rpc("create_business",{p_name:n}),"Espace créé.");tab=null;await load();return}
   if(a==="jb"){const c=v("jc").trim();if(!c){toast("Renseigne le code du propriétaire.");return}{const r=await sb.rpc("join_business",{p_code:c,p_role:v("jr")});if(r.error)throw r.error;if(!r.data){toast("Code inconnu. Vérifie le code donné par ton propriétaire.");return}toast("Demande envoyée.")}await load();return}
   if(a==="enter"){const k=d.s,m=k==="user"?null:mems.find(x=>x.status==="active"&&(k==="driver"?x.role==="driver":x.role!=="driver"));curSp=k;tab=null;try{sessionStorage.setItem("tm-sp",k)}catch(e){}if(m&&m.business_id!==bid){localStorage.setItem("tm-biz",m.business_id);await load();return}view();return}
